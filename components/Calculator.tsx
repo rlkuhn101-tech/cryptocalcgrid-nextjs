@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import {
+  averageBuyPrice,
   dca,
   marketCap,
   profit,
@@ -10,10 +11,13 @@ import {
   type ToolSlug
 } from '../lib/calculators';
 
-const configs: Record<
-  ToolSlug,
-  { fields: { name: string; label: string; initial: number }[] }
-> = {
+type Field = {
+  name: string;
+  label: string;
+  initial: number;
+};
+
+const configs: Record<ToolSlug, { fields: Field[] }> = {
   'crypto-profit-calculator': {
     fields: [
       { name: 'investment', label: 'Amount invested ($)', initial: 10000 },
@@ -22,32 +26,21 @@ const configs: Record<
       { name: 'fees', label: 'Total trading fees ($)', initial: 0 }
     ]
   },
-
   'crypto-dca-calculator': {
     fields: [
       { name: 'amount', label: 'Amount per contribution ($)', initial: 50 },
-      {
-        name: 'frequency',
-        label: 'Contributions per year (12 monthly, 52 weekly)',
-        initial: 52
-      },
+      { name: 'frequency', label: 'Contributions per year (12 monthly, 52 weekly)', initial: 52 },
       { name: 'years', label: 'Number of years', initial: 5 },
       { name: 'rate', label: 'Hypothetical annual return (%)', initial: 10 }
     ]
   },
-
   'crypto-market-cap-calculator': {
     fields: [
       { name: 'supply', label: 'Circulating supply (tokens)', initial: 1000000000 },
       { name: 'price', label: 'Current token price ($)', initial: 1 },
-      {
-        name: 'target',
-        label: 'Target market capitalization ($)',
-        initial: 5000000000
-      }
+      { name: 'target', label: 'Target market capitalization ($)', initial: 5000000000 }
     ]
   },
-
   'crypto-staking-rewards-calculator': {
     fields: [
       { name: 'tokens', label: 'Tokens staked', initial: 10000 },
@@ -55,6 +48,9 @@ const configs: Record<
       { name: 'years', label: 'Staking duration (years)', initial: 3 },
       { name: 'tokenPrice', label: 'Token price ($)', initial: 2 }
     ]
+  },
+  'crypto-average-buy-price-calculator': {
+    fields: []
   }
 };
 
@@ -70,6 +66,153 @@ const number = (n: number) =>
     maximumFractionDigits: 8
   }).format(n);
 
+function AverageBuyPriceCalculator() {
+  const [purchases, setPurchases] = useState([
+    { id: 1, tokens: '1000', price: '2' },
+    { id: 2, tokens: '2000', price: '1.5' },
+    { id: 3, tokens: '1000', price: '1' }
+  ]);
+
+  const [nextId, setNextId] = useState(4);
+
+  const valid = purchases.every(
+    p =>
+      p.tokens.trim() !== '' &&
+      p.price.trim() !== '' &&
+      Number.isFinite(Number(p.tokens)) &&
+      Number.isFinite(Number(p.price))
+  );
+
+  const result = valid
+    ? averageBuyPrice(
+        purchases.map(p => ({
+          tokens: Number(p.tokens),
+          price: Number(p.price)
+        }))
+      )
+    : null;
+
+  function updatePurchase(
+    id: number,
+    field: 'tokens' | 'price',
+    value: string
+  ) {
+    setPurchases(current =>
+      current.map(p =>
+        p.id === id ? { ...p, [field]: value } : p
+      )
+    );
+  }
+
+  function addPurchase() {
+    setPurchases(current => [
+      ...current,
+      { id: nextId, tokens: '', price: '' }
+    ]);
+    setNextId(id => id + 1);
+  }
+
+  function removePurchase(id: number) {
+    setPurchases(current =>
+      current.length > 1
+        ? current.filter(p => p.id !== id)
+        : current
+    );
+  }
+
+  return (
+    <div className="calc-layout">
+      <section className="panel">
+        <h2>Your purchases</h2>
+        <p>Enter each purchase separately.</p>
+
+        <div className="fields">
+          {purchases.map((p, index) => (
+            <div key={p.id}>
+              <h3>Purchase {index + 1}</h3>
+
+              <label>
+                Tokens purchased
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  inputMode="decimal"
+                  value={p.tokens}
+                  onChange={e =>
+                    updatePurchase(p.id, 'tokens', e.target.value)
+                  }
+                />
+              </label>
+
+              <label>
+                Price per token ($)
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  inputMode="decimal"
+                  value={p.price}
+                  onChange={e =>
+                    updatePurchase(p.id, 'price', e.target.value)
+                  }
+                />
+              </label>
+
+              <button
+                type="button"
+                onClick={() => removePurchase(p.id)}
+                disabled={purchases.length === 1}
+              >
+                Remove purchase
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <button type="button" onClick={addPurchase}>
+          + Add Purchase
+        </button>
+      </section>
+
+      <section className="panel results" aria-live="polite">
+        <h2>Your estimated results</h2>
+
+        {result ? (
+          <>
+            <div className="result-row">
+              <span>Total tokens</span>
+              <strong>{number(result.totalTokens)}</strong>
+            </div>
+            <div className="result-row">
+              <span>Total invested</span>
+              <strong>{money(result.totalInvested)}</strong>
+            </div>
+            <div className="result-row">
+              <span>Average buy price</span>
+              <strong>{money(result.averagePrice)}</strong>
+            </div>
+            <div className="result-row">
+              <span>Number of purchases</span>
+              <strong>{result.purchaseCount}</strong>
+            </div>
+          </>
+        ) : (
+          <p role="alert">
+            Enter valid purchase quantities greater than zero and
+            nonnegative prices for every purchase.
+          </p>
+        )}
+
+        <p className="disclaimer">
+          Weighted-average purchase price excludes trading fees.
+          Estimates only. No investment advice.
+        </p>
+      </section>
+    </div>
+  );
+}
+
 export default function Calculator({ slug }: { slug: ToolSlug }) {
   const config = configs[slug];
 
@@ -82,8 +225,14 @@ export default function Calculator({ slug }: { slug: ToolSlug }) {
   const get = (name: string) => Number(values[name]);
 
   const valid = config.fields.every(
-    f => values[f.name].trim() !== '' && Number.isFinite(get(f.name))
+    f =>
+      values[f.name].trim() !== '' &&
+      Number.isFinite(get(f.name))
   );
+
+  if (slug === 'crypto-average-buy-price-calculator') {
+    return <AverageBuyPriceCalculator />;
+  }
 
   let rows: [string, string][] = [];
   let error = '';
