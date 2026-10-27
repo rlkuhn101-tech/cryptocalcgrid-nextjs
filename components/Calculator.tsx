@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   averageBuyPrice,
   breakEvenPrice,
+    cryptoPriceTarget,
     investmentROI,
   dca,
   marketCap,
@@ -61,6 +62,16 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'totalFees', label: 'Total fees not already deducted ($)', initial: 100 }
   ]
 },
+ 
+'crypto-price-target-calculator': {
+  fields: [
+    { name: 'tokens', label: 'Tokens owned', initial: 10000 },
+    { name: 'currentPrice', label: 'Current token price ($)', initial: 2 },
+    { name: 'targetPrice', label: 'Target token price ($)', initial: 5 },
+    { name: 'averageBuyPrice', label: 'Average purchase price ($)', initial: 1.5 }
+  ]
+},
+ 
 
   'crypto-break-even-calculator': {
     fields: [
@@ -373,6 +384,40 @@ if (slug === 'crypto-investment-roi-calculator') {
         get('years'),
         get('tokenPrice')
       );
+
+if (slug === 'crypto-price-target-calculator') {
+  const r = cryptoPriceTarget(
+    get('tokens'),
+    get('currentPrice'),
+    get('targetPrice'),
+    get('averageBuyPrice')
+  );
+
+  if (r) {
+    rows = [
+      ['Tokens owned', number(r.tokens)],
+      ['Current holdings value', money(r.currentValue)],
+      ['Value at target price', money(r.targetValue)],
+      ['Original investment', money(r.investmentCost)],
+      ['Potential profit / loss', money(r.potentialProfit)],
+      [
+        'Price change to target',
+        r.priceChange === null
+          ? 'N/A'
+          : `${r.priceChange.toFixed(2)}%`
+      ],
+      [
+        'Investment ROI at target',
+        r.investmentROI === null
+          ? 'N/A'
+          : `${r.investmentROI.toFixed(2)}%`
+      ]
+    ];
+  } else {
+    error =
+      'Enter a token quantity greater than zero and nonnegative prices.';
+  }
+}
 
       if (r) {
         rows = [
