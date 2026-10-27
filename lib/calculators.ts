@@ -219,4 +219,39 @@ export function breakEvenPrice(
   };
 }
 
+export function investmentROI(
+  initialInvestment: number,
+  currentValue: number,
+  totalFees: number
+) {
+  if (
+    ![initialInvestment, currentValue, totalFees].every(Number.isFinite) ||
+    initialInvestment <= 0 ||
+    currentValue < 0 ||
+    totalFees < 0
+  ) {
+    return null;
+  }
+
+  const netProfit = currentValue - initialInvestment - totalFees;
+  const roiPercentage = (netProfit / initialInvestment) * 100;
+  const netValue = currentValue - totalFees;
+
+  if (
+    ![netProfit, roiPercentage, netValue].every(Number.isFinite)
+  ) {
+    return null;
+  }
+
+  return {
+    initialInvestment,
+    currentValue,
+    totalFees,
+    netValue,
+    netProfit,
+    roiPercentage
+  };
+}
+
+
 
