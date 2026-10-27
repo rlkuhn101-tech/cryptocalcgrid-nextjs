@@ -15,11 +15,19 @@ export const tools = [
     name: 'Crypto Market Cap',
     description: 'Estimate market capitalization and implied token price.'
   },
+  
   {
-    slug: 'crypto-staking-rewards-calculator',
-    name: 'Crypto Staking Rewards',
-    description: 'Estimate staking rewards, compounded token balances, and their value in dollars.'
-  }
+  slug: 'crypto-staking-rewards-calculator',
+  name: 'Crypto Staking Rewards',
+  description: 'Estimate staking rewards, compounded token balances, and their value in dollars.'
+},
+{
+  slug: 'crypto-average-buy-price-calculator',
+  name: 'Crypto Average Buy Price',
+  description: 'Calculate your weighted-average cryptocurrency purchase price across multiple transactions.'
+}
+
+  
 ] as const;
 
 export type ToolSlug = typeof tools[number]['slug'];
