@@ -376,15 +376,6 @@ if (slug === 'crypto-investment-roi-calculator') {
   }
 }
 
-
-    if (slug === 'crypto-staking-rewards-calculator') {
-      const r = stakingRewards(
-        get('tokens'),
-        get('apy'),
-        get('years'),
-        get('tokenPrice')
-      );
-
 if (slug === 'crypto-price-target-calculator') {
   const r = cryptoPriceTarget(
     get('tokens'),
@@ -418,6 +409,13 @@ if (slug === 'crypto-price-target-calculator') {
       'Enter a token quantity greater than zero and nonnegative prices.';
   }
 }
+     if (slug === 'crypto-staking-rewards-calculator') {
+      const r = stakingRewards(
+        get('tokens'),
+        get('apy'),
+        get('years'),
+        get('tokenPrice')
+      );
 
       if (r) {
         rows = [
