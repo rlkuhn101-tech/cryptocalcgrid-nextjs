@@ -174,3 +174,42 @@ export function averageBuyPrice(
   };
 }
 
+export function breakEvenPrice(
+  tokens: number,
+  averageBuyPrice: number,
+  purchaseFees: number,
+  sellingFees: number
+) {
+  if (
+    ![tokens, averageBuyPrice, purchaseFees, sellingFees].every(Number.isFinite) ||
+    tokens <= 0 ||
+    averageBuyPrice < 0 ||
+    purchaseFees < 0 ||
+    sellingFees < 0
+  ) {
+    return null;
+  }
+
+  const purchaseCost = tokens * averageBuyPrice;
+  const totalCost = purchaseCost + purchaseFees + sellingFees;
+
+  if (!Number.isFinite(totalCost)) {
+    return null;
+  }
+
+  const breakEven = totalCost / tokens;
+
+  return {
+    tokens,
+    purchaseCost,
+    totalFees: purchaseFees + sellingFees,
+    totalCost,
+    breakEven,
+    requiredIncrease:
+      averageBuyPrice > 0
+        ? ((breakEven - averageBuyPrice) / averageBuyPrice) * 100
+        : null
+  };
+}
+
+
