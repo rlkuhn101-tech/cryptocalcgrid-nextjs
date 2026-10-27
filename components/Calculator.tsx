@@ -1,9 +1,10 @@
-
+```
 'use client';
 
 import { useState } from 'react';
 import {
   averageBuyPrice,
+  breakEvenPrice,
   dca,
   marketCap,
   profit,
@@ -51,6 +52,14 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
   },
   'crypto-average-buy-price-calculator': {
     fields: []
+  },
+  'crypto-break-even-calculator': {
+    fields: [
+      { name: 'tokens', label: 'Tokens owned', initial: 10000 },
+      { name: 'averagePrice', label: 'Average purchase price ($)', initial: 2 },
+      { name: 'purchaseFees', label: 'Purchase fees ($)', initial: 50 },
+      { name: 'sellingFees', label: 'Estimated selling fees ($)', initial: 50 }
+    ]
   }
 };
 
@@ -303,6 +312,28 @@ export default function Calculator({ slug }: { slug: ToolSlug }) {
       }
     }
 
+    if (slug === 'crypto-break-even-calculator') {
+      const r = breakEvenPrice(
+        get('tokens'),
+        get('averagePrice'),
+        get('purchaseFees'),
+        get('sellingFees')
+      );
+
+      if (r) {
+        rows = [
+          ['Tokens owned', number(r.tokens)],
+          ['Original purchase cost', money(r.purchaseCost)],
+          ['Total trading fees', money(r.totalFees)],
+          ['Total amount to recover', money(r.totalCost)],
+          ['Break-even selling price', money(r.breakEven)],
+          ['Required price increase', r.requiredIncrease === null ? 'N/A (zero purchase price)' : `${r.requiredIncrease.toFixed(2)}%`]
+        ];
+      } else {
+        error = 'Enter a token quantity greater than zero and nonnegative prices and fees.';
+      }
+    }
+
     if (slug === 'crypto-staking-rewards-calculator') {
       const r = stakingRewards(
         get('tokens'),
@@ -377,3 +408,4 @@ export default function Calculator({ slug }: { slug: ToolSlug }) {
     </div>
   );
 }
+```
