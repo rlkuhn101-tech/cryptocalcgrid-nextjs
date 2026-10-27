@@ -123,3 +123,46 @@ export function stakingRewards(
     finalValue: finalTokens * tokenPrice
   };
 }
+
+export function averageBuyPrice(
+  purchases: { tokens: number; price: number }[]
+) {
+  if (
+    purchases.length === 0 ||
+    purchases.some(
+      p =>
+        !Number.isFinite(p.tokens) ||
+        !Number.isFinite(p.price) ||
+        p.tokens <= 0 ||
+        p.price < 0
+    )
+  ) {
+    return null;
+  }
+
+  const totalTokens = purchases.reduce(
+    (sum, p) => sum + p.tokens,
+    0
+  );
+
+  const totalInvested = purchases.reduce(
+    (sum, p) => sum + p.tokens * p.price,
+    0
+  );
+
+  if (
+    !Number.isFinite(totalTokens) ||
+    !Number.isFinite(totalInvested) ||
+    totalTokens <= 0
+  ) {
+    return null;
+  }
+
+  return {
+    totalTokens,
+    totalInvested,
+    averagePrice: totalInvested / totalTokens,
+    purchaseCount: purchases.length
+  };
+}
+
