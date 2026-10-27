@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   averageBuyPrice,
   breakEvenPrice,
+    investmentROI,
   dca,
   marketCap,
   profit,
@@ -52,6 +53,15 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
   'crypto-average-buy-price-calculator': {
     fields: []
   },
+  
+'crypto-investment-roi-calculator': {
+  fields: [
+    { name: 'initialInvestment', label: 'Initial investment ($)', initial: 10000 },
+    { name: 'currentValue', label: 'Current investment value ($)', initial: 15000 },
+    { name: 'totalFees', label: 'Total fees not already deducted ($)', initial: 100 }
+  ]
+},
+
   'crypto-break-even-calculator': {
     fields: [
       { name: 'tokens', label: 'Tokens owned', initial: 10000 },
@@ -332,6 +342,29 @@ export default function Calculator({ slug }: { slug: ToolSlug }) {
         error = 'Enter a token quantity greater than zero and nonnegative prices and fees.';
       }
     }
+    
+if (slug === 'crypto-investment-roi-calculator') {
+  const r = investmentROI(
+    get('initialInvestment'),
+    get('currentValue'),
+    get('totalFees')
+  );
+
+  if (r) {
+    rows = [
+      ['Initial investment', money(r.initialInvestment)],
+      ['Current investment value', money(r.currentValue)],
+      ['Total fees', money(r.totalFees)],
+      ['Net value after fees', money(r.netValue)],
+      ['Net profit / loss', money(r.netProfit)],
+      ['Return on investment', `${r.roiPercentage.toFixed(2)}%`]
+    ];
+  } else {
+    error =
+      'Enter an initial investment greater than zero and nonnegative values and fees.';
+  }
+}
+
 
     if (slug === 'crypto-staking-rewards-calculator') {
       const r = stakingRewards(
