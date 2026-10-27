@@ -27,11 +27,18 @@ export const tools = [
   name: 'Crypto Average Buy Price',
   description: 'Calculate your weighted-average cryptocurrency purchase price across multiple transactions.'
 },
+
 {
   slug: 'crypto-break-even-calculator',
   name: 'Crypto Break-Even Price',
   description: 'Calculate the selling price needed to recover your cryptocurrency investment and trading fees.'
+},
+{
+  slug: 'crypto-investment-roi-calculator',
+  name: 'Crypto Investment ROI',
+  description: 'Calculate cryptocurrency investment returns, net profit or loss, and ROI percentage.'
 }
+
 
 
 
