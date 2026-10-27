@@ -37,7 +37,14 @@ export const tools = [
   slug: 'crypto-investment-roi-calculator',
   name: 'Crypto Investment ROI',
   description: 'Calculate cryptocurrency investment returns, net profit or loss, and ROI percentage.'
+},
+  
+{
+  slug: 'crypto-price-target-calculator',
+  name: 'Crypto Price Target',
+  description: 'Calculate the potential future value, profit, and return of your cryptocurrency holdings at a target price.'
 }
+
 
 
 
