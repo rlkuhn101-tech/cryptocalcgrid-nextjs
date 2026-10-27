@@ -260,5 +260,56 @@ export function investmentROI(
   };
 }
 
+export function cryptoPriceTarget(
+  tokens: number,
+  currentPrice: number,
+  targetPrice: number,
+  averageBuyPrice: number
+) {
+  if (
+    ![tokens, currentPrice, targetPrice, averageBuyPrice].every(Number.isFinite) ||
+    tokens <= 0 ||
+    currentPrice < 0 ||
+    targetPrice < 0 ||
+    averageBuyPrice < 0
+  ) {
+    return null;
+  }
+
+  const currentValue = tokens * currentPrice;
+  const targetValue = tokens * targetPrice;
+  const investmentCost = tokens * averageBuyPrice;
+  const potentialProfit = targetValue - investmentCost;
+
+  const priceChange =
+    currentPrice > 0
+      ? ((targetPrice - currentPrice) / currentPrice) * 100
+      : null;
+
+  const investmentROI =
+    investmentCost > 0
+      ? (potentialProfit / investmentCost) * 100
+      : null;
+
+  if (
+    ![currentValue, targetValue, investmentCost, potentialProfit].every(Number.isFinite) ||
+    (priceChange !== null && !Number.isFinite(priceChange)) ||
+    (investmentROI !== null && !Number.isFinite(investmentROI))
+  ) {
+    return null;
+  }
+
+  return {
+    tokens,
+    currentValue,
+    targetValue,
+    investmentCost,
+    potentialProfit,
+    priceChange,
+    investmentROI
+  };
+}
+
+
 
 
