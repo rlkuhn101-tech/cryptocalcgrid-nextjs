@@ -1,4 +1,5 @@
-import type {Metadata} from 'next';import {notFound} from 'next/navigation';import Link from 'next/link';import Calculator from '../../../components/Calculator';import {tools,ToolSlug} from '../../../lib/calculators';
+import type {Metadata} from 'next';import {notFound} from 'next/navigation';import Link from 'next/link';import Calculator from '../components/Calculator';
+import { tools } from '../lib/calculators';
 type Props={params:Promise<{slug:string}>};
 export function generateStaticParams(){return tools.map(t=>({slug:t.slug}));}
 export async function generateMetadata({params}:Props):Promise<Metadata>{const {slug}=await params;const tool=tools.find(t=>t.slug===slug);return {title:tool?.name??'Calculator',description:tool?.description};}
