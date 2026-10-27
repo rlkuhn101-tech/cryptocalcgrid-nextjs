@@ -21,11 +21,19 @@ export const tools = [
   name: 'Crypto Staking Rewards',
   description: 'Estimate staking rewards, compounded token balances, and their value in dollars.'
 },
+
 {
   slug: 'crypto-average-buy-price-calculator',
   name: 'Crypto Average Buy Price',
   description: 'Calculate your weighted-average cryptocurrency purchase price across multiple transactions.'
+},
+{
+  slug: 'crypto-break-even-calculator',
+  name: 'Crypto Break-Even Price',
+  description: 'Calculate the selling price needed to recover your cryptocurrency investment and trading fees.'
 }
+
+
 
   
 ] as const;
