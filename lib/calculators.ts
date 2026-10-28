@@ -553,3 +553,74 @@ export function cryptoTradingFee(
 }
 
 
+export function cryptoMiningProfitability(
+  dailyRevenue: number,
+  powerWatts: number,
+  electricityRate: number,
+  equipmentCost: number
+) {
+  if (
+    ![
+      dailyRevenue,
+      powerWatts,
+      electricityRate,
+      equipmentCost
+    ].every(Number.isFinite) ||
+    dailyRevenue < 0 ||
+    powerWatts < 0 ||
+    electricityRate < 0 ||
+    equipmentCost < 0
+  ) {
+    return null;
+  }
+
+  const dailyElectricityCost =
+    (powerWatts / 1000) * 24 * electricityRate;
+
+  const dailyProfit = dailyRevenue - dailyElectricityCost;
+
+  const monthlyRevenue = dailyRevenue * 30;
+  const yearlyRevenue = dailyRevenue * 365;
+
+  const monthlyElectricityCost = dailyElectricityCost * 30;
+  const yearlyElectricityCost = dailyElectricityCost * 365;
+
+  const monthlyProfit = dailyProfit * 30;
+  const yearlyProfit = dailyProfit * 365;
+
+  const paybackDays =
+    dailyProfit > 0 ? equipmentCost / dailyProfit : null;
+
+  const results = [
+    dailyElectricityCost,
+    dailyProfit,
+    monthlyRevenue,
+    yearlyRevenue,
+    monthlyElectricityCost,
+    yearlyElectricityCost,
+    monthlyProfit,
+    yearlyProfit
+  ];
+
+  if (!results.every(Number.isFinite) ||
+      (paybackDays !== null && !Number.isFinite(paybackDays))) {
+    return null;
+  }
+
+  return {
+    dailyRevenue,
+    powerWatts,
+    electricityRate,
+    equipmentCost,
+    dailyElectricityCost,
+    monthlyRevenue,
+    yearlyRevenue,
+    monthlyElectricityCost,
+    yearlyElectricityCost,
+    dailyProfit,
+    monthlyProfit,
+    yearlyProfit,
+    paybackDays
+  };
+}
+
