@@ -61,6 +61,12 @@ export const tools = [
   slug: 'crypto-position-size-calculator',
   name: 'Crypto Position Size',
   description: 'Calculate how much to invest and how many cryptocurrency tokens to purchase based on your portfolio value and desired allocation.'
+},
+
+{
+  slug: 'crypto-market-cap-to-price-calculator',
+  name: 'Crypto Market Cap to Price',
+  description: 'Estimate a cryptocurrency token price from its target market capitalization and circulating supply, and compare it with the current price.'
 }
 
 
@@ -430,5 +436,46 @@ export function cryptoPositionSize(
   };
 }
 
+
+export function cryptoMarketCapToPrice(
+  circulatingSupply: number,
+  targetMarketCap: number,
+  currentPrice: number
+) {
+  if (
+    ![circulatingSupply, targetMarketCap, currentPrice].every(Number.isFinite) ||
+    circulatingSupply <= 0 ||
+    targetMarketCap < 0 ||
+    currentPrice <= 0
+  ) {
+    return null;
+  }
+
+  const impliedPrice = targetMarketCap / circulatingSupply;
+  const priceChange = impliedPrice - currentPrice;
+  const percentageChange = (priceChange / currentPrice) * 100;
+  const currentMarketCap = circulatingSupply * currentPrice;
+
+  if (
+    ![
+      impliedPrice,
+      priceChange,
+      percentageChange,
+      currentMarketCap
+    ].every(Number.isFinite)
+  ) {
+    return null;
+  }
+
+  return {
+    circulatingSupply,
+    targetMarketCap,
+    currentPrice,
+    currentMarketCap,
+    impliedPrice,
+    priceChange,
+    percentageChange
+  };
+}
 
 
