@@ -428,7 +428,7 @@ export default function Calculator({ slug }: { slug: ToolSlug }) {
 if (slug === 'crypto-portfolio-allocation-calculator') {
   return <PortfolioAllocationCalculator />;
 }
-s
+
   let rows: [string, string][] = [];
   let error = '';
 
