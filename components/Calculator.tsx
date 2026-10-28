@@ -8,7 +8,8 @@ import {
    cryptoPositionSize,
   cryptoMarketCapToPrice,
   cryptoTradingFee,
- cryptoPriceTarget,
+  cryptoMiningProfitability,
+cryptoPriceTarget,
    cryptoPercentageChange,
  investmentROI,
   dca,
@@ -113,6 +114,14 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
   ]
 },
 
+'crypto-mining-profitability-calculator': {
+  fields: [
+    { name: 'dailyRevenue', label: 'Estimated daily mining revenue ($)', initial: 10 },
+    { name: 'powerWatts', label: 'Mining equipment power consumption (watts)', initial: 1000 },
+    { name: 'electricityRate', label: 'Electricity cost per kWh ($)', initial: 0.15 },
+    { name: 'equipmentCost', label: 'Mining equipment cost ($)', initial: 2000 }
+  ]
+},
 
   'crypto-break-even-calculator': {
     fields: [
@@ -694,6 +703,39 @@ if (slug === 'crypto-trading-fee-calculator') {
       'Enter a purchase amount greater than zero, a nonnegative sale amount, and buying and selling fees between 0% and 100%.';
   }
 }
+   
+if (slug === 'crypto-mining-profitability-calculator') {
+  const r = cryptoMiningProfitability(
+    get('dailyRevenue'),
+    get('powerWatts'),
+    get('electricityRate'),
+    get('equipmentCost')
+  );
+
+  if (r) {
+    rows = [
+      ['Daily mining revenue', money(r.dailyRevenue)],
+      ['Monthly mining revenue', money(r.monthlyRevenue)],
+      ['Yearly mining revenue', money(r.yearlyRevenue)],
+      ['Daily electricity cost', money(r.dailyElectricityCost)],
+      ['Monthly electricity cost', money(r.monthlyElectricityCost)],
+      ['Yearly electricity cost', money(r.yearlyElectricityCost)],
+      ['Daily net profit or loss', money(r.dailyProfit)],
+      ['Monthly net profit or loss', money(r.monthlyProfit)],
+      ['Yearly net profit or loss', money(r.yearlyProfit)],
+      [
+        'Estimated equipment payback period',
+        r.paybackDays === null
+          ? 'Not achievable at current profitability'
+          : `${number(r.paybackDays)} days`
+      ]
+    ];
+  } else {
+    error =
+      'Enter valid nonnegative values for mining revenue, power consumption, electricity rate, and equipment cost.';
+  }
+}
+ 
 
     if (slug === 'crypto-staking-rewards-calculator') {
       const r = stakingRewards(
