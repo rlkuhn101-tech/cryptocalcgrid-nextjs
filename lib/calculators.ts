@@ -75,6 +75,12 @@ export const tools = [
   description: 'Calculate cryptocurrency buying and selling fees, total trading costs, net profit or loss, and return on investment after exchange fees.'
 },
 
+{
+  slug: 'crypto-mining-profitability-calculator',
+  name: 'Crypto Mining Profitability Calculator',
+  description: 'Estimate cryptocurrency mining revenue, electricity expenses, daily and monthly profits, and equipment payback time.'
+},
+
 
   
 ] as const;
