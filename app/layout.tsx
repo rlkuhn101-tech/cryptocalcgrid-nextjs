@@ -19,10 +19,15 @@ export const metadata: Metadata = {
     siteName: 'CryptoCalcGrid',
     type: 'website'
   },
+ 
   robots: {
     index: true,
     follow: true
+  },
+  verification: {
+    google: 'c6uKtX4iLi4jwPv4ycmuJrcWIS0jB_GZCMRqxNH7jg8'
   }
 };
+
 
 export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body><header className="site-header"><div className="shell header-inner"><Link className="brand" href="/">↗ <span>Crypto<span className="accent">CalcGrid</span></span></Link><nav aria-label="Main navigation"><Link href="/">Home</Link><Link href="/#calculators">Calculators</Link></nav></div></header>{children}<footer className="shell footer">© {new Date().getFullYear()} CryptoCalcGrid · Educational estimates, not financial advice.</footer></body></html>}
