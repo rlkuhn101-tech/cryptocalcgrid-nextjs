@@ -1,4 +1,8 @@
-import type {Metadata} from 'next';import Link from 'next/link';import './globals.css';
+
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import Script from 'next/script';
+import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cryptocalcgrid.com'),
@@ -19,7 +23,6 @@ export const metadata: Metadata = {
     siteName: 'CryptoCalcGrid',
     type: 'website'
   },
- 
   robots: {
     index: true,
     follow: true
@@ -29,5 +32,47 @@ export const metadata: Metadata = {
   }
 };
 
+export default function RootLayout({
+  children
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-YM1WWSS3TD"
+          strategy="afterInteractive"
+        />
 
-export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body><header className="site-header"><div className="shell header-inner"><Link className="brand" href="/">↗ <span>Crypto<span className="accent">CalcGrid</span></span></Link><nav aria-label="Main navigation"><Link href="/">Home</Link><Link href="/#calculators">Calculators</Link></nav></div></header>{children}<footer className="shell footer">© {new Date().getFullYear()} CryptoCalcGrid · Educational estimates, not financial advice.</footer></body></html>}
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-YM1WWSS3TD');
+          `}
+        </Script>
+
+        <header className="site-header">
+          <div className="shell header-inner">
+            <Link className="brand" href="/">
+              ↗ <span>Crypto<span className="accent">CalcGrid</span></span>
+            </Link>
+
+            <nav aria-label="Main navigation">
+              <Link href="/">Home</Link>
+              <Link href="/#calculators">Calculators</Link>
+            </nav>
+          </div>
+        </header>
+
+        {children}
+
+        <footer className="shell footer">
+          © {new Date().getFullYear()} CryptoCalcGrid · Educational estimates, not financial advice.
+        </footer>
+      </body>
+    </html>
+  );
+}
