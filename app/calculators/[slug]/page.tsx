@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Calculator from '../../../components/Calculator';
 import { tools, type ToolSlug } from '../../../lib/calculators';
 import { calculatorContent } from '../../../lib/calculatorContent';
+import { calculatorFAQs } from '../../../lib/calculatorFAQs';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -36,6 +37,7 @@ export default async function CalculatorPage({ params }: Props) {
   if (!tool) notFound();
 
   const content = calculatorContent[slug];
+  const faqs = calculatorFAQs[slug] ?? [];
 
   return (
     <main className="shell calculator-page">
@@ -61,6 +63,30 @@ export default async function CalculatorPage({ params }: Props) {
 
           <h2>Important Considerations</h2>
           <p>{content.note}</p>
+        </section>
+      )}
+
+      {faqs.length > 0 && (
+        <section className="info">
+          <h2>Frequently Asked Questions</h2>
+
+          {faqs.map((faq, index) => (
+            <details key={index}>
+              <summary
+                style={{
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  padding: '12px 0'
+                }}
+              >
+                {faq.question}
+              </summary>
+
+              <p style={{ paddingBottom: '12px' }}>
+                {faq.answer}
+              </p>
+            </details>
+          ))}
         </section>
       )}
     </main>
