@@ -6,6 +6,7 @@ import {
   breakEvenPrice,
     cryptoPortfolioAllocation,
    cryptoPositionSize,
+  cryptoMarketCapToPrice,
  cryptoPriceTarget,
    cryptoPercentageChange,
  investmentROI,
@@ -91,6 +92,14 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'portfolioValue', label: 'Total portfolio value ($)', initial: 50000 },
     { name: 'allocationPercentage', label: 'Desired allocation (%)', initial: 10 },
     { name: 'tokenPrice', label: 'Token purchase price ($)', initial: 2.5 }
+  ]
+},
+
+'crypto-market-cap-to-price-calculator': {
+  fields: [
+    { name: 'circulatingSupply', label: 'Circulating token supply', initial: 50000000000 },
+    { name: 'targetMarketCap', label: 'Target market capitalization ($)', initial: 250000000000 },
+    { name: 'currentPrice', label: 'Current token price ($)', initial: 2 }
   ]
 },
 
@@ -278,6 +287,7 @@ function PortfolioAllocationCalculator() {
       h.name.trim() !== '' &&
       h.value.trim() !== '' &&
       Number.isFinite(Number(h.value)) &&
+    
       Number(h.value) >= 0
   );
 
@@ -611,7 +621,7 @@ if (slug === 'crypto-position-size-calculator') {
     get('allocationPercentage'),
     get('tokenPrice')
   );
-
+  
   if (r) {
     rows = [
       ['Total portfolio value', money(r.portfolioValue)],
@@ -623,6 +633,29 @@ if (slug === 'crypto-position-size-calculator') {
   } else {
     error =
       'Enter a portfolio value greater than zero, an allocation between 0% and 100%, and a token price greater than zero.';
+  }
+}
+
+if (slug === 'crypto-market-cap-to-price-calculator') {
+  const r = cryptoMarketCapToPrice(
+    get('circulatingSupply'),
+    get('targetMarketCap'),
+    get('currentPrice')
+  );
+
+  if (r) {
+    rows = [
+      ['Circulating token supply', number(r.circulatingSupply)],
+      ['Target market capitalization', money(r.targetMarketCap)],
+      ['Current token price', money(r.currentPrice)],
+      ['Current market capitalization', money(r.currentMarketCap)],
+      ['Implied token price', money(r.impliedPrice)],
+      ['Price change', money(r.priceChange)],
+      ['Percentage change', `${r.percentageChange.toFixed(2)}%`]
+    ];
+  } else {
+    error =
+      'Enter a circulating supply greater than zero, a nonnegative target market cap, and a current token price greater than zero.';
   }
 }
 
