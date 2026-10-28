@@ -630,3 +630,53 @@ export function cryptoMiningProfitability(
   };
 }
 
+
+export function cryptoTokenBurn(
+  circulatingSupply: number,
+  currentPrice: number,
+  tokensBurned: number
+) {
+  if (
+    ![circulatingSupply, currentPrice, tokensBurned].every(Number.isFinite) ||
+    circulatingSupply <= 0 ||
+    currentPrice <= 0 ||
+    tokensBurned < 0 ||
+    tokensBurned >= circulatingSupply
+  ) {
+    return null;
+  }
+
+  const remainingSupply = circulatingSupply - tokensBurned;
+  const burnPercentage = (tokensBurned / circulatingSupply) * 100;
+
+  const currentMarketCap = circulatingSupply * currentPrice;
+  const theoreticalNewPrice = currentMarketCap / remainingSupply;
+
+  const priceIncrease = theoreticalNewPrice - currentPrice;
+  const percentageIncrease = (priceIncrease / currentPrice) * 100;
+
+  if (
+    ![
+      remainingSupply,
+      burnPercentage,
+      currentMarketCap,
+      theoreticalNewPrice,
+      priceIncrease,
+      percentageIncrease
+    ].every(Number.isFinite)
+  ) {
+    return null;
+  }
+
+  return {
+    circulatingSupply,
+    currentPrice,
+    tokensBurned,
+    remainingSupply,
+    burnPercentage,
+    currentMarketCap,
+    theoreticalNewPrice,
+    priceIncrease,
+    percentageIncrease
+  };
+}
