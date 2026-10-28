@@ -394,5 +394,41 @@ export function cryptoPortfolioAllocation(
 }
 
 
+export function cryptoPositionSize(
+  portfolioValue: number,
+  allocationPercentage: number,
+  tokenPrice: number
+) {
+  if (
+    ![portfolioValue, allocationPercentage, tokenPrice].every(Number.isFinite) ||
+    portfolioValue <= 0 ||
+    allocationPercentage < 0 ||
+    allocationPercentage > 100 ||
+    tokenPrice <= 0
+  ) {
+    return null;
+  }
+
+  const investmentAmount =
+    portfolioValue * (allocationPercentage / 100);
+
+  const tokensToPurchase = investmentAmount / tokenPrice;
+
+  if (
+    !Number.isFinite(investmentAmount) ||
+    !Number.isFinite(tokensToPurchase)
+  ) {
+    return null;
+  }
+
+  return {
+    portfolioValue,
+    allocationPercentage,
+    tokenPrice,
+    investmentAmount,
+    tokensToPurchase
+  };
+}
+
 
 
