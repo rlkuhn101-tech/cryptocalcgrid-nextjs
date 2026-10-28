@@ -5,7 +5,8 @@ import {
   averageBuyPrice,
   breakEvenPrice,
     cryptoPriceTarget,
-    investmentROI,
+   cryptoPercentageChange,
+ investmentROI,
   dca,
   marketCap,
   profit,
@@ -69,6 +70,13 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'currentPrice', label: 'Current token price ($)', initial: 2 },
     { name: 'targetPrice', label: 'Target token price ($)', initial: 5 },
     { name: 'averageBuyPrice', label: 'Average purchase price ($)', initial: 1.5 }
+  ]
+},
+
+'crypto-percentage-change-calculator': {
+  fields: [
+    { name: 'startingPrice', label: 'Starting token price ($)', initial: 2 },
+    { name: 'endingPrice', label: 'Ending token price ($)', initial: 3.5 }
   ]
 },
  
@@ -383,6 +391,7 @@ if (slug === 'crypto-price-target-calculator') {
     get('targetPrice'),
     get('averageBuyPrice')
   );
+  
 
   if (r) {
     rows = [
@@ -409,7 +418,27 @@ if (slug === 'crypto-price-target-calculator') {
       'Enter a token quantity greater than zero and nonnegative prices.';
   }
 }
-     if (slug === 'crypto-staking-rewards-calculator') {
+   
+if (slug === 'crypto-percentage-change-calculator') {
+  const r = cryptoPercentageChange(
+    get('startingPrice'),
+    get('endingPrice')
+  );
+
+  if (r) {
+    rows = [
+      ['Starting price', money(r.startingPrice)],
+      ['Ending price', money(r.endingPrice)],
+      ['Dollar change', money(r.dollarChange)],
+      ['Percentage change', `${r.percentageChange.toFixed(2)}%`]
+    ];
+  } else {
+    error =
+      'Enter a starting price greater than zero and a nonnegative ending price.';
+  }
+}
+s 
+    if (slug === 'crypto-staking-rewards-calculator') {
       const r = stakingRewards(
         get('tokens'),
         get('apy'),
