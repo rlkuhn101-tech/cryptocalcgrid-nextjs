@@ -9,6 +9,7 @@ import {
   cryptoMarketCapToPrice,
   cryptoTradingFee,
   cryptoMiningProfitability,
+  cryptoTokenBurn,
 cryptoPriceTarget,
    cryptoPercentageChange,
  investmentROI,
@@ -122,6 +123,16 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'equipmentCost', label: 'Mining equipment cost ($)', initial: 2000 }
   ]
 },
+
+  
+'crypto-token-burn-calculator': {
+  fields: [
+    { name: 'circulatingSupply', label: 'Current circulating token supply', initial: 100000000000 },
+    { name: 'currentPrice', label: 'Current token price ($)', initial: 2 },
+    { name: 'tokensBurned', label: 'Number of tokens to burn', initial: 20000000000 }
+  ]
+},
+
 
   'crypto-break-even-calculator': {
     fields: [
@@ -735,7 +746,33 @@ if (slug === 'crypto-mining-profitability-calculator') {
       'Enter valid nonnegative values for mining revenue, power consumption, electricity rate, and equipment cost.';
   }
 }
- 
+
+    
+if (slug === 'crypto-token-burn-calculator') {
+  const r = cryptoTokenBurn(
+    get('circulatingSupply'),
+    get('currentPrice'),
+    get('tokensBurned')
+  );
+
+  if (r) {
+    rows = [
+      ['Current circulating supply', number(r.circulatingSupply)],
+      ['Current token price', money(r.currentPrice)],
+      ['Tokens burned', number(r.tokensBurned)],
+      ['Percentage of supply burned', `${r.burnPercentage.toFixed(2)}%`],
+      ['Remaining token supply', number(r.remainingSupply)],
+      ['Current market capitalization', money(r.currentMarketCap)],
+      ['Theoretical new token price', money(r.theoreticalNewPrice)],
+      ['Theoretical price increase', money(r.priceIncrease)],
+      ['Theoretical percentage increase', `${r.percentageIncrease.toFixed(2)}%`]
+    ];
+  } else {
+    error =
+      'Enter a circulating supply and current price greater than zero. Tokens burned must be nonnegative and less than the circulating supply.';
+  }
+}
+
 
     if (slug === 'crypto-staking-rewards-calculator') {
       const r = stakingRewards(
