@@ -437,7 +437,7 @@ if (slug === 'crypto-percentage-change-calculator') {
       'Enter a starting price greater than zero and a nonnegative ending price.';
   }
 }
-s 
+ 
     if (slug === 'crypto-staking-rewards-calculator') {
       const r = stakingRewards(
         get('tokens'),
