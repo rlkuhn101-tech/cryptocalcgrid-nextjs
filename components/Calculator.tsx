@@ -7,6 +7,7 @@ import {
     cryptoPortfolioAllocation,
    cryptoPositionSize,
   cryptoMarketCapToPrice,
+  cryptoTradingFee,
  cryptoPriceTarget,
    cryptoPercentageChange,
  investmentROI,
@@ -100,6 +101,15 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'circulatingSupply', label: 'Circulating token supply', initial: 50000000000 },
     { name: 'targetMarketCap', label: 'Target market capitalization ($)', initial: 250000000000 },
     { name: 'currentPrice', label: 'Current token price ($)', initial: 2 }
+  ]
+},
+
+'crypto-trading-fee-calculator': {
+  fields: [
+    { name: 'purchaseAmount', label: 'Cryptocurrency purchase amount ($)', initial: 1000 },
+    { name: 'saleAmount', label: 'Cryptocurrency sale amount ($)', initial: 1500 },
+    { name: 'buyFeePercentage', label: 'Buying fee (%)', initial: 0.5 },
+    { name: 'sellFeePercentage', label: 'Selling fee (%)', initial: 0.5 }
   ]
 },
 
@@ -656,6 +666,32 @@ if (slug === 'crypto-market-cap-to-price-calculator') {
   } else {
     error =
       'Enter a circulating supply greater than zero, a nonnegative target market cap, and a current token price greater than zero.';
+  }
+}
+
+if (slug === 'crypto-trading-fee-calculator') {
+  const r = cryptoTradingFee(
+    get('purchaseAmount'),
+    get('saleAmount'),
+    get('buyFeePercentage'),
+    get('sellFeePercentage')
+  );
+
+  if (r) {
+    rows = [
+      ['Purchase amount', money(r.purchaseAmount)],
+      ['Buying fee', money(r.purchaseFee)],
+      ['Total purchase cost', money(r.totalPurchaseCost)],
+      ['Sale amount', money(r.saleAmount)],
+      ['Selling fee', money(r.sellingFee)],
+      ['Net sale proceeds', money(r.netSaleProceeds)],
+      ['Total trading fees', money(r.totalFees)],
+      ['Net profit or loss', money(r.netProfit)],
+      ['Return on investment', `${r.roi.toFixed(2)}%`]
+    ];
+  } else {
+    error =
+      'Enter a purchase amount greater than zero, a nonnegative sale amount, and buying and selling fees between 0% and 100%.';
   }
 }
 
