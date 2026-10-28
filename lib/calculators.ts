@@ -316,6 +316,37 @@ export function cryptoPriceTarget(
   };
 }
 
+export function cryptoPercentageChange(
+  startingPrice: number,
+  endingPrice: number
+) {
+  if (
+    ![startingPrice, endingPrice].every(Number.isFinite) ||
+    startingPrice <= 0 ||
+    endingPrice < 0
+  ) {
+    return null;
+  }
+
+  const dollarChange = endingPrice - startingPrice;
+  const percentageChange =
+    (dollarChange / startingPrice) * 100;
+
+  if (
+    !Number.isFinite(dollarChange) ||
+    !Number.isFinite(percentageChange)
+  ) {
+    return null;
+  }
+
+  return {
+    startingPrice,
+    endingPrice,
+    dollarChange,
+    percentageChange
+  };
+}
+
 
 
 
