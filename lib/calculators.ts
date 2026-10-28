@@ -81,6 +81,12 @@ export const tools = [
   description: 'Estimate cryptocurrency mining revenue, electricity expenses, daily and monthly profits, and equipment payback time.'
 },
 
+{
+  slug: 'crypto-token-burn-calculator',
+  name: 'Crypto Token Burn Calculator',
+  description: 'Calculate remaining cryptocurrency supply after a token burn and estimate the theoretical price change assuming market capitalization stays constant.'
+},
+
 
   
 ] as const;
