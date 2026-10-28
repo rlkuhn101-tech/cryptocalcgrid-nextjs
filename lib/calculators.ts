@@ -354,6 +354,43 @@ export function cryptoPercentageChange(
   };
 }
 
+export function cryptoPortfolioAllocation(
+  holdings: { name: string; value: number }[]
+) {
+  if (
+    holdings.length === 0 ||
+    holdings.some(
+      h =>
+        h.name.trim() === '' ||
+        !Number.isFinite(h.value) ||
+        h.value < 0
+    )
+  ) {
+    return null;
+  }
+
+  const totalValue = holdings.reduce(
+    (sum, h) => sum + h.value,
+    0
+  );
+
+  if (!Number.isFinite(totalValue) || totalValue <= 0) {
+    return null;
+  }
+
+  const allocations = holdings.map(h => ({
+    name: h.name.trim(),
+    value: h.value,
+    percentage: (h.value / totalValue) * 100
+  }));
+
+  return {
+    totalValue,
+    allocations,
+    cryptocurrencyCount: holdings.length
+  };
+}
+
 
 
 
