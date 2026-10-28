@@ -484,4 +484,66 @@ export function cryptoMarketCapToPrice(
   };
 }
 
+export function cryptoTradingFee(
+  purchaseAmount: number,
+  saleAmount: number,
+  buyFeePercentage: number,
+  sellFeePercentage: number
+) {
+  if (
+    ![
+      purchaseAmount,
+      saleAmount,
+      buyFeePercentage,
+      sellFeePercentage
+    ].every(Number.isFinite) ||
+    purchaseAmount <= 0 ||
+    saleAmount < 0 ||
+    buyFeePercentage < 0 ||
+    buyFeePercentage > 100 ||
+    sellFeePercentage < 0 ||
+    sellFeePercentage > 100
+  ) {
+    return null;
+  }
+
+  const purchaseFee = purchaseAmount * (buyFeePercentage / 100);
+  const sellingFee = saleAmount * (sellFeePercentage / 100);
+
+  const totalPurchaseCost = purchaseAmount + purchaseFee;
+  const netSaleProceeds = saleAmount - sellingFee;
+  const totalFees = purchaseFee + sellingFee;
+
+  const netProfit = netSaleProceeds - totalPurchaseCost;
+  const roi = (netProfit / totalPurchaseCost) * 100;
+
+  if (
+    ![
+      purchaseFee,
+      sellingFee,
+      totalPurchaseCost,
+      netSaleProceeds,
+      totalFees,
+      netProfit,
+      roi
+    ].every(Number.isFinite)
+  ) {
+    return null;
+  }
+
+  return {
+    purchaseAmount,
+    saleAmount,
+    buyFeePercentage,
+    sellFeePercentage,
+    purchaseFee,
+    sellingFee,
+    totalPurchaseCost,
+    netSaleProceeds,
+    totalFees,
+    netProfit,
+    roi
+  };
+}
+
 
