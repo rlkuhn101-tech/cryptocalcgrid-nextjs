@@ -67,7 +67,7 @@ export const tools = [
   slug: 'crypto-market-cap-to-price-calculator',
   name: 'Crypto Market Cap to Price',
   description: 'Estimate a cryptocurrency token price from its target market capitalization and circulating supply, and compare it with the current price.'
-}
+},
 
 {
   slug: 'crypto-trading-fee-calculator',
