@@ -1,1 +1,12 @@
-import type {MetadataRoute} from 'next';export default function robots():MetadataRoute.Robots{return {rules:{userAgent:'*',allow:'/'},sitemap:'https://cryptocalcgrid.com/sitemap.xml'};}
+
+import type { MetadataRoute } from 'next';
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+    },
+    sitemap: 'https://www.cryptocalcgrid.com/sitemap.xml',
+  };
+}
