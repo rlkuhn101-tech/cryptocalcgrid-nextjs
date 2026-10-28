@@ -49,7 +49,14 @@ export const tools = [
   slug: 'crypto-percentage-change-calculator',
   name: 'Crypto Percentage Change',
   description: 'Calculate the dollar and percentage change between two cryptocurrency prices.'
+},
+
+{
+  slug: 'crypto-portfolio-allocation-calculator',
+  name: 'Crypto Portfolio Allocation',
+  description: 'Add multiple cryptocurrency holdings and calculate your total portfolio value and each coin’s percentage allocation.'
 }
+  
 
 
 
