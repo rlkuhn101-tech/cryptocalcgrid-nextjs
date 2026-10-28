@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   averageBuyPrice,
   breakEvenPrice,
+    cryptoPortfolioAllocation,
     cryptoPriceTarget,
    cryptoPercentageChange,
  investmentROI,
@@ -78,6 +79,10 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'startingPrice', label: 'Starting token price ($)', initial: 2 },
     { name: 'endingPrice', label: 'Ending token price ($)', initial: 3.5 }
   ]
+},
+
+'crypto-portfolio-allocation-calculator': {
+  fields: []
 },
  
 
@@ -250,6 +255,155 @@ function AverageBuyPriceCalculator() {
   );
 }
 
+function PortfolioAllocationCalculator() {
+  const [holdings, setHoldings] = useState([
+    { id: 1, name: 'XRP', value: '25000' },
+    { id: 2, name: 'Bitcoin', value: '15000' },
+    { id: 3, name: 'HBAR', value: '10000' }
+  ]);
+
+  const [nextId, setNextId] = useState(4);
+
+  const valid = holdings.every(
+    h =>
+      h.name.trim() !== '' &&
+      h.value.trim() !== '' &&
+      Number.isFinite(Number(h.value)) &&
+      Number(h.value) >= 0
+  );
+
+  const result = valid
+    ? cryptoPortfolioAllocation(
+        holdings.map(h => ({
+          name: h.name,
+          value: Number(h.value)
+        }))
+      )
+    : null;
+
+  function updateHolding(
+    id: number,
+    field: 'name' | 'value',
+    value: string
+  ) {
+    setHoldings(current =>
+      current.map(h =>
+        h.id === id ? { ...h, [field]: value } : h
+      )
+    );
+  }
+
+  function addHolding() {
+    setHoldings(current => [
+      ...current,
+      { id: nextId, name: '', value: '' }
+    ]);
+    setNextId(id => id + 1);
+  }
+
+  function removeHolding(id: number) {
+    setHoldings(current =>
+      current.length > 1
+        ? current.filter(h => h.id !== id)
+        : current
+    );
+  }
+
+  return (
+    <div className="calc-layout">
+      <section className="panel">
+        <h2>Your cryptocurrency holdings</h2>
+        <p>Enter each cryptocurrency and its current dollar value.</p>
+
+        <div className="fields">
+          {holdings.map((h, index) => (
+            <div key={h.id}>
+              <h3>Cryptocurrency {index + 1}</h3>
+
+              <label>
+                Cryptocurrency name
+                <input
+                  type="text"
+                  value={h.name}
+                  placeholder="e.g. XRP"
+                  onChange={e =>
+                    updateHolding(h.id, 'name', e.target.value)
+                  }
+                />
+              </label>
+
+              <label>
+                Current holding value ($)
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  inputMode="decimal"
+                  value={h.value}
+                  onChange={e =>
+                    updateHolding(h.id, 'value', e.target.value)
+                  }
+                />
+              </label>
+
+              <button
+                type="button"
+                onClick={() => removeHolding(h.id)}
+                disabled={holdings.length === 1}
+              >
+                Remove Cryptocurrency
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <button type="button" onClick={addHolding}>
+          + Add Cryptocurrency
+        </button>
+      </section>
+
+      <section className="panel results" aria-live="polite">
+        <h2>Your portfolio allocation</h2>
+
+        {result ? (
+          <>
+            <div className="result-row">
+              <span>Total portfolio value</span>
+              <strong>{money(result.totalValue)}</strong>
+            </div>
+
+            <div className="result-row">
+              <span>Number of cryptocurrencies</span>
+              <strong>{result.cryptocurrencyCount}</strong>
+            </div>
+
+            {result.allocations.map((h, index) => (
+              <div className="result-row" key={index}>
+                <span>{h.name}</span>
+                <strong>
+                  {money(h.value)} ({h.percentage.toFixed(2)}%)
+                </strong>
+              </div>
+            ))}
+          </>
+        ) : (
+          <p role="alert">
+            Enter a name and nonnegative dollar value for each
+            cryptocurrency. Total portfolio value must be greater
+            than zero.
+          </p>
+        )}
+
+        <p className="disclaimer">
+          Portfolio allocations are based on the dollar values
+          entered. Estimates only. No investment advice.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+
 export default function Calculator({ slug }: { slug: ToolSlug }) {
   const config = configs[slug];
 
@@ -271,6 +425,10 @@ export default function Calculator({ slug }: { slug: ToolSlug }) {
     return <AverageBuyPriceCalculator />;
   }
 
+if (slug === 'crypto-portfolio-allocation-calculator') {
+  return <PortfolioAllocationCalculator />;
+}
+s
   let rows: [string, string][] = [];
   let error = '';
 
