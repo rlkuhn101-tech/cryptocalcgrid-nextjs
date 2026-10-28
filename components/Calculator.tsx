@@ -5,7 +5,8 @@ import {
   averageBuyPrice,
   breakEvenPrice,
     cryptoPortfolioAllocation,
-    cryptoPriceTarget,
+   cryptoPositionSize,
+ cryptoPriceTarget,
    cryptoPercentageChange,
  investmentROI,
   dca,
@@ -85,6 +86,14 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
   fields: []
 },
  
+'crypto-position-size-calculator': {
+  fields: [
+    { name: 'portfolioValue', label: 'Total portfolio value ($)', initial: 50000 },
+    { name: 'allocationPercentage', label: 'Desired allocation (%)', initial: 10 },
+    { name: 'tokenPrice', label: 'Token purchase price ($)', initial: 2.5 }
+  ]
+},
+
 
   'crypto-break-even-calculator': {
     fields: [
@@ -595,7 +604,28 @@ if (slug === 'crypto-percentage-change-calculator') {
       'Enter a starting price greater than zero and a nonnegative ending price.';
   }
 }
- 
+    
+if (slug === 'crypto-position-size-calculator') {
+  const r = cryptoPositionSize(
+    get('portfolioValue'),
+    get('allocationPercentage'),
+    get('tokenPrice')
+  );
+
+  if (r) {
+    rows = [
+      ['Total portfolio value', money(r.portfolioValue)],
+      ['Desired allocation', `${r.allocationPercentage.toFixed(2)}%`],
+      ['Amount to invest', money(r.investmentAmount)],
+      ['Token purchase price', money(r.tokenPrice)],
+      ['Tokens to purchase', number(r.tokensToPurchase)]
+    ];
+  } else {
+    error =
+      'Enter a portfolio value greater than zero, an allocation between 0% and 100%, and a token price greater than zero.';
+  }
+}
+
     if (slug === 'crypto-staking-rewards-calculator') {
       const r = stakingRewards(
         get('tokens'),
