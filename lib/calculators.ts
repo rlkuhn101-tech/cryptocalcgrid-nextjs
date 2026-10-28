@@ -43,6 +43,12 @@ export const tools = [
   slug: 'crypto-price-target-calculator',
   name: 'Crypto Price Target',
   description: 'Calculate the potential future value, profit, and return of your cryptocurrency holdings at a target price.'
+},
+
+{
+  slug: 'crypto-percentage-change-calculator',
+  name: 'Crypto Percentage Change',
+  description: 'Calculate the dollar and percentage change between two cryptocurrency prices.'
 }
 
 
