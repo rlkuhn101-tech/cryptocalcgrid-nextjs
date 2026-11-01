@@ -11,7 +11,16 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-slate-900 px-6 py-12 text-slate-200">
-      <div className="mx-auto max-w-3xl">
+      
+<div
+  className="mx-auto max-w-3xl"
+  style={{
+    maxWidth: "850px",
+    margin: "0 auto",
+    padding: "0 24px",
+  }}
+>
+
         <Link
           href="/"
           className="text-cyan-400 hover:underline"
