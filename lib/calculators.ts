@@ -19,7 +19,7 @@ export const tools = [
   {
   slug: 'crypto-staking-rewards-calculator',
   name: 'Crypto Staking Rewards',
-  description: 'Estimate staking rewards, compounded token balances, and their value in dollars.'
+  description: 'Free Crypto Staking Rewards Calculator. Estimate cryptocurrency staking earnings, APY returns, compounded token balances, and potential rewards in dollars.',
 },
 
 {
