@@ -42,7 +42,7 @@ export const tools = [
 {
   slug: 'crypto-price-target-calculator',
   name: 'Crypto Price Target',
-  description: 'Calculate the potential future value, profit, and return of your cryptocurrency holdings at a target price.'
+  description: 'Free Crypto Price Target Calculator. Estimate the potential value of your cryptocurrency holdings, investment profit, and ROI at a hypothetical future token price.',
 },
 
 {
