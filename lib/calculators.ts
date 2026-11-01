@@ -3,7 +3,7 @@ export const tools = [
   {
     slug: 'crypto-profit-calculator',
     name: 'Crypto Profit & Loss',
-    description: 'Calculate net gains, return percentage, and token quantities.'
+    description: 'Free Crypto Profit & Loss Calculator. Calculate cryptocurrency gains, losses, ROI percentages, and token quantities to understand your investment performance.',
   },
   {
     slug: 'crypto-dca-calculator',
