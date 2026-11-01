@@ -8,7 +8,7 @@ export const tools = [
   {
     slug: 'crypto-dca-calculator',
     name: 'Crypto DCA Planner',
-    description: 'Model recurring contributions using a hypothetical annual return.'
+    description: 'Free Crypto DCA Calculator. Plan recurring cryptocurrency investments using dollar-cost averaging and estimate potential portfolio growth with hypothetical returns.',
   },
   {
     slug: 'crypto-market-cap-calculator',
