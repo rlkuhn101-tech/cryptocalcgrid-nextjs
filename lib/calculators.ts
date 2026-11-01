@@ -60,7 +60,7 @@ export const tools = [
 {
   slug: 'crypto-position-size-calculator',
   name: 'Crypto Position Size',
-  description: 'Calculate how much to invest and how many cryptocurrency tokens to purchase based on your portfolio value and desired allocation.'
+  description: 'Free Crypto Position Size Calculator. Calculate how much cryptocurrency to buy based on your portfolio value, target allocation, and token purchase price.',
 },
 
 {
