@@ -69,9 +69,40 @@ export default function RootLayout({
 
         {children}
 
-        <footer className="shell footer">
-          © {new Date().getFullYear()} CryptoCalcGrid · Educational estimates, not financial advice.
-        </footer>
+<footer className="shell footer">
+  <div
+    style={{
+      textAlign: "center",
+      padding: "24px 16px",
+    }}
+  >
+    <nav
+      aria-label="Footer navigation"
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        flexWrap: "wrap",
+        gap: "12px 24px",
+        marginBottom: "16px",
+      }}
+    >
+      <Link href="/about">About Us</Link>
+      <Link href="/contact">Contact Us</Link>
+      <Link href="/privacy-policy">Privacy Policy</Link>
+      <Link href="/terms-of-use">Terms of Use</Link>
+    </nav>
+
+    <p style={{ margin: 0 }}>
+      © {new Date().getFullYear()} CryptoCalcGrid
+    </p>
+
+    <p style={{ marginTop: "8px" }}>
+      Educational estimates, not financial advice.
+    </p>
+  </div>
+</footer>
+
+        
       </body>
     </html>
   );
