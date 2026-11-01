@@ -13,7 +13,7 @@ export const tools = [
   {
     slug: 'crypto-market-cap-calculator',
     name: 'Crypto Market Cap',
-    description: 'Estimate market capitalization and implied token price.'
+   description: 'Free Crypto Market Cap Calculator. Estimate cryptocurrency price targets using market capitalization and circulating supply. Compare target and current token prices.',
   },
   
   {
