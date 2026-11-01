@@ -45,6 +45,32 @@ export default function Home() {
           after reliable source data and calculation methodology are integrated.
         </p>
       </section>
+
+<section className="info">
+  <h2>Explore More Financial Calculators</h2>
+  <p>
+    Looking for mortgage, loan, retirement, savings,
+    or investment calculators? Visit CapitalRewards.com
+    for 50 free financial calculators to help you
+    make informed financial decisions.
+  </p>
+  <p>
+    <a
+      href="https://www.capitalrewards.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        color: "#22d3ee",
+        fontWeight: "bold",
+        textDecoration: "underline",
+      }}
+    >
+      Visit CapitalRewards.com
+    </a>
+  </p>
+</section>
+
+      
     </main>
   );
 }
