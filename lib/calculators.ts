@@ -31,7 +31,7 @@ export const tools = [
 {
   slug: 'crypto-break-even-calculator',
   name: 'Crypto Break-Even Price',
-  description: 'Calculate the selling price needed to recover your cryptocurrency investment and trading fees.'
+  description: 'Free Crypto Break-Even Price Calculator. Find the cryptocurrency selling price needed to recover your investment costs and trading fees without a loss.',
 },
 {
   slug: 'crypto-investment-roi-calculator',
