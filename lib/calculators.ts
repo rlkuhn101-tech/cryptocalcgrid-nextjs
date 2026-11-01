@@ -25,7 +25,7 @@ export const tools = [
 {
   slug: 'crypto-average-buy-price-calculator',
   name: 'Crypto Average Buy Price',
-  description: 'Calculate your weighted-average cryptocurrency purchase price across multiple transactions.'
+  description: 'Free Crypto Average Buy Price Calculator. Calculate your weighted average cryptocurrency purchase price across multiple transactions and track your average cost per token.',
 },
 
 {
