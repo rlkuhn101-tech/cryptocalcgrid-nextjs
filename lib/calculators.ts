@@ -84,7 +84,7 @@ export const tools = [
 {
   slug: 'crypto-token-burn-calculator',
   name: 'Crypto Token Burn Calculator',
-  description: description: 'Free Crypto Token Burn Calculator. Estimate remaining token supply and theoretical cryptocurrency price changes after a burn, assuming constant market capitalization.',
+  description: 'Free Crypto Token Burn Calculator. Estimate remaining token supply and theoretical cryptocurrency price changes after a burn, assuming constant market capitalization.',
 },
 
 
