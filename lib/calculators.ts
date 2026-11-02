@@ -72,7 +72,7 @@ export const tools = [
 {
   slug: 'crypto-trading-fee-calculator',
   name: 'Crypto Trading Fee Calculator',
-  description: 'Calculate cryptocurrency buying and selling fees, total trading costs, net profit or loss, and return on investment after exchange fees.'
+  description: 'Free Crypto Trading Fee Calculator. Calculate cryptocurrency exchange fees, buying and selling costs, net trading profit or loss, and return on investment after fees.',
 },
 
 {
