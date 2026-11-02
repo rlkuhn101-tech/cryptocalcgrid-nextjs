@@ -54,7 +54,7 @@ export const tools = [
 {
   slug: 'crypto-portfolio-allocation-calculator',
   name: 'Crypto Portfolio Allocation',
-  description: 'Add multiple cryptocurrency holdings and calculate your total portfolio value and each coin’s percentage allocation.'
+  description: 'Free Crypto Portfolio Allocation Calculator. Add multiple cryptocurrency holdings, calculate your total portfolio value, and see each coin’s percentage allocation.',
 },
   
 {
