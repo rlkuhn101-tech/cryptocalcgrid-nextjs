@@ -78,7 +78,7 @@ export const tools = [
 {
   slug: 'crypto-mining-profitability-calculator',
   name: 'Crypto Mining Profitability Calculator',
-  description: 'Estimate cryptocurrency mining revenue, electricity expenses, daily and monthly profits, and equipment payback time.'
+  description: 'Free Crypto Mining Profitability Calculator. Estimate daily and monthly cryptocurrency mining revenue, electricity costs, net mining profits, and equipment payback time.',
 },
 
 {
