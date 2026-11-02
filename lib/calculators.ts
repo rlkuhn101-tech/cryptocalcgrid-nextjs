@@ -48,7 +48,7 @@ export const tools = [
 {
   slug: 'crypto-percentage-change-calculator',
   name: 'Crypto Percentage Change',
-  description: 'Calculate the dollar and percentage change between two cryptocurrency prices.'
+  description: 'Free Crypto Percentage Change Calculator. Calculate the dollar difference and percentage increase or decrease between two cryptocurrency prices.',
 },
 
 {
