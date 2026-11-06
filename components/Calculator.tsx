@@ -174,6 +174,10 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
   fields: []
 },
 
+'crypto-futures-funding-fee-calculator': {
+  fields: []
+},
+
 
   'crypto-break-even-calculator': {
     fields: [
