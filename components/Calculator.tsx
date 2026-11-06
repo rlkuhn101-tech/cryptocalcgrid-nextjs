@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import {
-  averageBuyPrice,
+  cryptoTakeProfit,
+ averageBuyPrice,
   breakEvenPrice,
     cryptoPortfolioAllocation,
    cryptoPositionSize,
@@ -131,6 +132,10 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'currentPrice', label: 'Current token price ($)', initial: 2 },
     { name: 'tokensBurned', label: 'Number of tokens to burn', initial: 20000000000 }
   ]
+},
+
+'crypto-take-profit-calculator': {
+  fields: []
 },
 
 
@@ -453,6 +458,220 @@ function PortfolioAllocationCalculator() {
 }
 
 
+function TakeProfitCalculator() {
+  const [tokens, setTokens] = useState('10000');
+  const [buyPrice, setBuyPrice] = useState('1.50');
+
+  const [targets, setTargets] = useState([
+    { id: 1, price: '3', percentage: '25' },
+    { id: 2, price: '5', percentage: '25' },
+    { id: 3, price: '10', percentage: '50' }
+  ]);
+
+  const [nextId, setNextId] = useState(4);
+
+  function updateTarget(
+    id: number,
+    field: 'price' | 'percentage',
+    value: string
+  ) {
+    setTargets(current =>
+      current.map(t =>
+        t.id === id ? { ...t, [field]: value } : t
+      )
+    );
+  }
+
+  function addTarget() {
+    setTargets(current => [
+      ...current,
+      { id: nextId, price: '', percentage: '' }
+    ]);
+    setNextId(id => id + 1);
+  }
+
+  function removeTarget(id: number) {
+    setTargets(current =>
+      current.length > 1
+        ? current.filter(t => t.id !== id)
+        : current
+    );
+  }
+
+  const valid =
+    tokens.trim() !== '' &&
+    buyPrice.trim() !== '' &&
+    targets.every(
+      t =>
+        t.price.trim() !== '' &&
+        t.percentage.trim() !== ''
+    );
+
+  const result = valid
+    ? cryptoTakeProfit(
+        Number(tokens),
+        Number(buyPrice),
+        targets.map(t => ({
+          price: Number(t.price),
+          percentage: Number(t.percentage)
+        }))
+      )
+    : null;
+
+  return (
+    <div className="calc-layout">
+      <section className="panel">
+        <h2>Your cryptocurrency holdings</h2>
+
+        <div className="fields">
+          <label>
+            Total tokens owned
+            <input
+              type="number"
+              min="0"
+              step="any"
+              value={tokens}
+              onChange={e => setTokens(e.target.value)}
+            />
+          </label>
+
+          <label>
+            Average purchase price ($)
+            <input
+              type="number"
+              min="0"
+              step="any"
+              value={buyPrice}
+              onChange={e => setBuyPrice(e.target.value)}
+            />
+          </label>
+        </div>
+
+        <h2>Selling targets</h2>
+        <p>
+          Each percentage represents a portion of
+          your original token holdings.
+        </p>
+
+        <div className="fields">
+          {targets.map((t, index) => (
+            <div key={t.id}>
+              <h3>Target {index + 1}</h3>
+
+              <label>
+                Target selling price ($)
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={t.price}
+                  onChange={e =>
+                    updateTarget(t.id, 'price', e.target.value)
+                  }
+                />
+              </label>
+
+              <label>
+                Percentage of holdings to sell (%)
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="any"
+                  value={t.percentage}
+                  onChange={e =>
+                    updateTarget(t.id, 'percentage', e.target.value)
+                  }
+                />
+              </label>
+
+              <button
+                type="button"
+                disabled={targets.length === 1}
+                onClick={() => removeTarget(t.id)}
+              >
+                Remove Target
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <button type="button" onClick={addTarget}>
+          + Add Selling Target
+        </button>
+      </section>
+
+      <section className="panel results" aria-live="polite">
+        <h2>Your estimated results</h2>
+
+        {result ? (
+          <>
+            {result.sales.map((sale, index) => (
+              <div key={index}>
+                <h3>Target {index + 1}</h3>
+
+                <div className="result-row">
+                  <span>Target price</span>
+                  <strong>{money(sale.targetPrice)}</strong>
+                </div>
+
+                <div className="result-row">
+                  <span>Tokens sold</span>
+                  <strong>{number(sale.tokensSold)}</strong>
+                </div>
+
+                <div className="result-row">
+                  <span>Sale proceeds</span>
+                  <strong>{money(sale.proceeds)}</strong>
+                </div>
+
+                <div className="result-row">
+                  <span>Profit / loss</span>
+                  <strong>{money(sale.profit)}</strong>
+                </div>
+              </div>
+            ))}
+
+            <h3>Total results</h3>
+
+            <div className="result-row">
+              <span>Total tokens sold</span>
+              <strong>{number(result.totalTokensSold)}</strong>
+            </div>
+
+            <div className="result-row">
+              <span>Total sale proceeds</span>
+              <strong>{money(result.totalProceeds)}</strong>
+            </div>
+
+            <div className="result-row">
+              <span>Total profit / loss</span>
+              <strong>{money(result.totalProfit)}</strong>
+            </div>
+
+            <div className="result-row">
+              <span>Remaining tokens</span>
+              <strong>{number(result.remainingTokens)}</strong>
+            </div>
+          </>
+        ) : (
+          <p role="alert">
+            Enter valid token amounts, purchase prices,
+            and selling targets. The combined selling
+            percentages cannot exceed 100%.
+          </p>
+        )}
+
+        <p className="disclaimer">
+          Estimates exclude trading fees, taxes and
+          slippage. Selling percentages are based on
+          original holdings. Not financial advice.
+        </p>
+      </section>
+    </div>
+  );
+}
+
 export default function Calculator({ slug }: { slug: ToolSlug }) {
   const config = configs[slug];
 
@@ -476,6 +695,10 @@ export default function Calculator({ slug }: { slug: ToolSlug }) {
 
 if (slug === 'crypto-portfolio-allocation-calculator') {
   return <PortfolioAllocationCalculator />;
+}
+
+if (slug === 'crypto-take-profit-calculator') {
+  return <TakeProfitCalculator />;
 }
 
   let rows: [string, string][] = [];
