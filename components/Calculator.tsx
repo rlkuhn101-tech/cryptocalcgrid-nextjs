@@ -5,7 +5,8 @@ import {
   cryptoTakeProfit,
    cryptoLiquidationRisk,
 cryptoApyVsApr,
- averageBuyPrice,
+ cryptoLoanToValue,
+averageBuyPrice,
   breakEvenPrice,
     cryptoPortfolioAllocation,
    cryptoPositionSize,
@@ -155,6 +156,15 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'apr', label: 'Annual percentage rate (APR %)', initial: 5 },
     { name: 'compoundsPerYear', label: 'Compounding periods per year (12 monthly, 365 daily)', initial: 12 },
     { name: 'years', label: 'Investment duration (years)', initial: 5 }
+  ]
+},
+
+'crypto-loan-to-value-calculator': {
+  fields: [
+    { name: 'collateralTokens', label: 'Number of collateral tokens', initial: 10000 },
+    { name: 'tokenPrice', label: 'Current token price ($)', initial: 2 },
+    { name: 'loanBalance', label: 'Outstanding loan balance ($)', initial: 10000 },
+    { name: 'maxLTV', label: 'Maximum allowed LTV (%)', initial: 50 }
   ]
 },
 
@@ -1073,6 +1083,34 @@ if (slug === 'crypto-apy-vs-apr-calculator') {
   } else {
     error =
       'Enter an investment greater than zero, an APR between 0% and 1000%, a whole-number compounding frequency from 1 to 365, and a duration from 0 to 50 years.';
+  }
+}
+
+if (slug === 'crypto-loan-to-value-calculator') {
+  const r = cryptoLoanToValue(
+    get('collateralTokens'),
+    get('tokenPrice'),
+    get('loanBalance'),
+    get('maxLTV')
+  );
+
+  if (r) {
+    rows = [
+      ['Collateral tokens', number(r.collateralTokens)],
+      ['Current token price', money(r.tokenPrice)],
+      ['Total collateral value', money(r.collateralValue)],
+      ['Outstanding loan balance', money(r.loanBalance)],
+      ['Current loan-to-value ratio', `${r.currentLTV.toFixed(2)}%`],
+      ['Maximum allowed LTV', `${r.maxLTV.toFixed(2)}%`],
+      ['Maximum borrowing amount', money(r.maximumLoan)],
+      ['Additional borrowing capacity', money(r.availableBorrowing)],
+      ['Required collateral value', money(r.requiredCollateral)],
+      ['Additional collateral needed', money(r.additionalCollateral)],
+      ['Additional tokens needed', number(r.additionalTokens)]
+    ];
+  } else {
+    error =
+      'Enter a collateral token quantity and token price greater than zero, a nonnegative loan balance, and a maximum LTV between 0% and 100%.';
   }
 }
 
