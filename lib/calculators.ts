@@ -92,6 +92,12 @@ export const tools = [
   description: 'Free Crypto Take-Profit Calculator. Plan cryptocurrency sales at multiple target prices, calculate potential profits, and estimate remaining token holdings.',
 },
 
+{
+  slug: 'crypto-liquidation-risk-calculator',
+  name: 'Crypto Liquidation Risk Calculator',
+  description: 'Free Crypto Liquidation Risk Calculator. Estimate cryptocurrency loan liquidation prices, loan-to-value ratios, collateral requirements, and how far crypto prices can fall before reaching a liquidation threshold.',
+},
+
   
 ] as const;
 
@@ -779,6 +785,75 @@ export function cryptoTakeProfit(
     totalProceeds,
     totalProfit,
     remainingTokens
+  };
+}
+
+export function cryptoLiquidationRisk(
+  collateralTokens: number,
+  tokenPrice: number,
+  loanBalance: number,
+  liquidationLTV: number
+) {
+  if (
+    ![
+      collateralTokens,
+      tokenPrice,
+      loanBalance,
+      liquidationLTV
+    ].every(Number.isFinite) ||
+    collateralTokens <= 0 ||
+    tokenPrice <= 0 ||
+    loanBalance < 0 ||
+    liquidationLTV <= 0 ||
+    liquidationLTV > 100
+  ) {
+    return null;
+  }
+
+  const collateralValue = collateralTokens * tokenPrice;
+
+  const currentLTV =
+    (loanBalance / collateralValue) * 100;
+
+  const liquidationPrice =
+    loanBalance / (collateralTokens * (liquidationLTV / 100));
+
+  const priceDrop =
+    ((tokenPrice - liquidationPrice) / tokenPrice) * 100;
+
+  const additionalCollateralValue = Math.max(
+    0,
+    loanBalance / (liquidationLTV / 100) - collateralValue
+  );
+
+  const additionalTokens =
+    additionalCollateralValue / tokenPrice;
+
+  const results = [
+    collateralValue,
+    currentLTV,
+    liquidationPrice,
+    priceDrop,
+    additionalCollateralValue,
+    additionalTokens
+  ];
+
+  if (!results.every(Number.isFinite)) {
+    return null;
+  }
+
+  return {
+    collateralTokens,
+    tokenPrice,
+    loanBalance,
+    liquidationLTV,
+    collateralValue,
+    currentLTV,
+    liquidationPrice,
+    priceDrop,
+    additionalCollateralValue,
+    additionalTokens,
+    atLiquidationRisk: currentLTV >= liquidationLTV
   };
 }
 
