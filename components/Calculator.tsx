@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import {
   cryptoTakeProfit,
- averageBuyPrice,
+   cryptoLiquidationRisk,
+averageBuyPrice,
   breakEvenPrice,
     cryptoPortfolioAllocation,
    cryptoPositionSize,
@@ -136,6 +137,15 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
 
 'crypto-take-profit-calculator': {
   fields: []
+},
+
+'crypto-liquidation-risk-calculator': {
+  fields: [
+    { name: 'collateralTokens', label: 'Number of collateral tokens', initial: 10000 },
+    { name: 'tokenPrice', label: 'Current token price ($)', initial: 2 },
+    { name: 'loanBalance', label: 'Outstanding loan balance ($)', initial: 10000 },
+    { name: 'liquidationLTV', label: 'Liquidation LTV threshold (%)', initial: 80 }
+  ]
 },
 
 
@@ -993,6 +1003,39 @@ if (slug === 'crypto-token-burn-calculator') {
   } else {
     error =
       'Enter a circulating supply and current price greater than zero. Tokens burned must be nonnegative and less than the circulating supply.';
+  }
+}
+
+if (slug === 'crypto-liquidation-risk-calculator') {
+  const r = cryptoLiquidationRisk(
+    get('collateralTokens'),
+    get('tokenPrice'),
+    get('loanBalance'),
+    get('liquidationLTV')
+  );
+
+  if (r) {
+    rows = [
+      ['Collateral tokens', number(r.collateralTokens)],
+      ['Current token price', money(r.tokenPrice)],
+      ['Current collateral value', money(r.collateralValue)],
+      ['Outstanding loan balance', money(r.loanBalance)],
+      ['Current loan-to-value ratio', `${r.currentLTV.toFixed(2)}%`],
+      ['Liquidation LTV threshold', `${r.liquidationLTV.toFixed(2)}%`],
+      ['Estimated liquidation price', money(r.liquidationPrice)],
+      ['Price decline before liquidation', `${r.priceDrop.toFixed(2)}%`],
+      ['Additional collateral required at current price', money(r.additionalCollateralValue)],
+      ['Additional tokens required', number(r.additionalTokens)],
+      [
+        'Liquidation risk status',
+        r.atLiquidationRisk
+          ? 'At or above liquidation threshold'
+          : 'Below liquidation threshold'
+      ]
+    ];
+  } else {
+    error =
+      'Enter a collateral token quantity and token price greater than zero, a nonnegative loan balance, and a liquidation LTV threshold between 0% and 100%.';
   }
 }
 
