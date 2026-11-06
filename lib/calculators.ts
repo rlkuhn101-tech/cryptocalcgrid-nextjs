@@ -116,6 +116,12 @@ export const tools = [
   description: 'Free Crypto Portfolio Rebalancing Calculator. Calculate how much cryptocurrency to buy or sell to reach your target portfolio allocations and maintain your desired investment balance.',
 },
 
+{
+  slug: 'crypto-futures-funding-fee-calculator',
+  name: 'Crypto Futures Funding Fee Calculator',
+  description: 'Free Crypto Futures Funding Fee Calculator. Estimate funding payments paid or received on cryptocurrency perpetual futures positions based on position size, funding rate, and funding intervals.',
+},
+
   
 ] as const;
 
@@ -1062,6 +1068,58 @@ export function cryptoPortfolioRebalancing(
     totalValue,
     totalTarget,
     allocations
+  };
+}
+
+export function cryptoFuturesFundingFee(
+  positionSize: number,
+  fundingRate: number,
+  fundingIntervals: number,
+  positionType: 'Long' | 'Short'
+) {
+  if (
+    ![positionSize, fundingRate, fundingIntervals].every(Number.isFinite) ||
+    positionSize <= 0 ||
+    !Number.isInteger(fundingIntervals) ||
+    fundingIntervals < 1 ||
+    fundingIntervals > 10000 ||
+    (positionType !== 'Long' && positionType !== 'Short')
+  ) {
+    return null;
+  }
+
+  const fundingPerInterval =
+    positionSize * (fundingRate / 100);
+
+  const totalFunding =
+    fundingPerInterval * fundingIntervals;
+
+  const signedPayment =
+    positionType === 'Long'
+      ? totalFunding
+      : -totalFunding;
+
+  if (
+    ![fundingPerInterval, totalFunding, signedPayment]
+      .every(Number.isFinite)
+  ) {
+    return null;
+  }
+
+  return {
+    positionSize,
+    fundingRate,
+    fundingIntervals,
+    positionType,
+    fundingPerInterval,
+    totalFunding,
+    signedPayment,
+    action:
+      Math.abs(signedPayment) < 0.00000001
+        ? 'No funding payment'
+        : signedPayment > 0
+          ? 'Pay funding'
+          : 'Receive funding'
   };
 }
 
