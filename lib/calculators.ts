@@ -128,6 +128,12 @@ export const tools = [
   description: 'Free Crypto DCA Exit Calculator. Plan gradual cryptocurrency sales, estimate proceeds from scheduled token sales, and calculate remaining holdings and potential profit.',
 },
 
+{
+  slug: 'crypto-validator-rewards-calculator',
+  name: 'Crypto Validator Rewards Calculator',
+  description: 'Free Crypto Validator Rewards Calculator. Estimate cryptocurrency validator rewards, annual operating costs, net earnings, and potential returns based on staked tokens and reward rates.',
+},
+
   
 ] as const;
 
@@ -1207,4 +1213,93 @@ export function cryptoDcaExit(
     averageSalePrice: totalProceeds / totalTokensSold
   };
 }
+
+export function cryptoValidatorRewards(
+  ownStake: number,
+  delegatedStake: number,
+  annualRewardRate: number,
+  commissionRate: number,
+  tokenPrice: number,
+  annualOperatingCosts: number
+) {
+  const inputs = [
+    ownStake,
+    delegatedStake,
+    annualRewardRate,
+    commissionRate,
+    tokenPrice,
+    annualOperatingCosts
+  ];
+
+  if (
+    !inputs.every(Number.isFinite) ||
+    ownStake < 0 ||
+    delegatedStake < 0 ||
+    ownStake + delegatedStake <= 0 ||
+    annualRewardRate < 0 ||
+    commissionRate < 0 ||
+    commissionRate > 100 ||
+    tokenPrice < 0 ||
+    annualOperatingCosts < 0
+  ) {
+    return null;
+  }
+
+  const ownStakeRewards =
+    ownStake * (annualRewardRate / 100);
+
+  const delegatedStakeRewards =
+    delegatedStake * (annualRewardRate / 100);
+
+  const commissionRewards =
+    delegatedStakeRewards * (commissionRate / 100);
+
+  const totalValidatorRewards =
+    ownStakeRewards + commissionRewards;
+
+  const grossAnnualRevenue =
+    totalValidatorRewards * tokenPrice;
+
+  const netAnnualRevenue =
+    grossAnnualRevenue - annualOperatingCosts;
+
+  const totalStake = ownStake + delegatedStake;
+
+  const netReturnOnOwnStake =
+    ownStake > 0 && tokenPrice > 0
+      ? (netAnnualRevenue / (ownStake * tokenPrice)) * 100
+      : null;
+
+  const results = [
+    ownStakeRewards,
+    delegatedStakeRewards,
+    commissionRewards,
+    totalValidatorRewards,
+    grossAnnualRevenue,
+    netAnnualRevenue,
+    totalStake
+  ];
+
+  if (
+    !results.every(Number.isFinite) ||
+    (netReturnOnOwnStake !== null &&
+      !Number.isFinite(netReturnOnOwnStake))
+  ) {
+    return null;
+  }
+
+  return {
+    ownStakeRewards,
+    delegatedStakeRewards,
+    commissionRewards,
+    totalValidatorRewards,
+    grossAnnualRevenue,
+    annualOperatingCosts,
+    netAnnualRevenue,
+    totalStake,
+    netReturnOnOwnStake
+  };
+}
+
+
 
