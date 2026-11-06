@@ -122,6 +122,12 @@ export const tools = [
   description: 'Free Crypto Futures Funding Fee Calculator. Estimate funding payments paid or received on cryptocurrency perpetual futures positions based on position size, funding rate, and funding intervals.',
 },
 
+{
+  slug: 'crypto-dca-exit-calculator',
+  name: 'Crypto DCA Exit Calculator',
+  description: 'Free Crypto DCA Exit Calculator. Plan gradual cryptocurrency sales, estimate proceeds from scheduled token sales, and calculate remaining holdings and potential profit.',
+},
+
   
 ] as const;
 
@@ -1120,6 +1126,85 @@ export function cryptoFuturesFundingFee(
         : signedPayment > 0
           ? 'Pay funding'
           : 'Receive funding'
+  };
+}
+
+export function cryptoDcaExit(
+  tokensOwned: number,
+  averageBuyPrice: number,
+  tokensPerSale: number,
+  numberOfSales: number,
+  firstSalePrice: number,
+  priceChangePerSale: number
+) {
+  const inputs = [
+    tokensOwned,
+    averageBuyPrice,
+    tokensPerSale,
+    numberOfSales,
+    firstSalePrice,
+    priceChangePerSale
+  ];
+
+  if (
+    !inputs.every(Number.isFinite) ||
+    tokensOwned <= 0 ||
+    averageBuyPrice < 0 ||
+    tokensPerSale <= 0 ||
+    !Number.isInteger(numberOfSales) ||
+    numberOfSales < 1 ||
+    numberOfSales > 1000 ||
+    firstSalePrice < 0 ||
+    tokensPerSale * numberOfSales > tokensOwned
+  ) {
+    return null;
+  }
+
+  const sales = [];
+
+  for (let i = 0; i < numberOfSales; i++) {
+    const salePrice =
+      firstSalePrice * Math.pow(1 + priceChangePerSale / 100, i);
+
+    if (!Number.isFinite(salePrice) || salePrice < 0) {
+      return null;
+    }
+
+    const proceeds = tokensPerSale * salePrice;
+    const costBasis = tokensPerSale * averageBuyPrice;
+
+    sales.push({
+      saleNumber: i + 1,
+      tokensSold: tokensPerSale,
+      salePrice,
+      proceeds,
+      profit: proceeds - costBasis
+    });
+  }
+
+  const totalTokensSold = tokensPerSale * numberOfSales;
+  const remainingTokens = tokensOwned - totalTokensSold;
+  const totalProceeds = sales.reduce(
+    (sum, sale) => sum + sale.proceeds, 0
+  );
+  const totalProfit = sales.reduce(
+    (sum, sale) => sum + sale.profit, 0
+  );
+
+  if (
+    ![totalProceeds, totalProfit, remainingTokens]
+      .every(Number.isFinite)
+  ) {
+    return null;
+  }
+
+  return {
+    sales,
+    totalTokensSold,
+    remainingTokens,
+    totalProceeds,
+    totalProfit,
+    averageSalePrice: totalProceeds / totalTokensSold
   };
 }
 
