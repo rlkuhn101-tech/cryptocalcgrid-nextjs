@@ -7,6 +7,7 @@ import {
 cryptoApyVsApr,
  cryptoLoanToValue,
   cryptoPortfolioRebalancing,
+  cryptoFuturesFundingFee,
 averageBuyPrice,
   breakEvenPrice,
     cryptoPortfolioAllocation,
@@ -916,6 +917,142 @@ function TakeProfitCalculator() {
   );
 }
 
+function FuturesFundingFeeCalculator() {
+  const [positionSize, setPositionSize] = useState('10000');
+  const [fundingRate, setFundingRate] = useState('0.01');
+  const [fundingIntervals, setFundingIntervals] = useState('3');
+  const [positionType, setPositionType] = useState<'Long' | 'Short'>('Long');
+
+  const result = cryptoFuturesFundingFee(
+    Number(positionSize),
+    Number(fundingRate),
+    Number(fundingIntervals),
+    positionType
+  );
+
+  const money = (value: number) =>
+    value.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 8,
+    });
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">
+          Crypto Futures Funding Fee Calculator
+        </h2>
+        <p className="mt-2 text-sm text-gray-600">
+          Estimate funding payments for cryptocurrency perpetual futures.
+          Positive funding rates typically mean longs pay shorts.
+          Negative rates typically mean shorts pay longs.
+        </p>
+      </div>
+
+      <div className="space-y-4 rounded-xl border p-5">
+        <label className="block">
+          <span className="mb-1 block font-medium">
+            Position Value (USD)
+          </span>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={positionSize}
+            onChange={(e) => setPositionSize(e.target.value)}
+            className="w-full rounded-lg border p-3"
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block font-medium">
+            Funding Rate per Interval (%)
+          </span>
+          <input
+            type="number"
+            step="any"
+            value={fundingRate}
+            onChange={(e) => setFundingRate(e.target.value)}
+            className="w-full rounded-lg border p-3"
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block font-medium">
+            Number of Funding Intervals
+          </span>
+          <input
+            type="number"
+            min="1"
+            max="10000"
+            step="1"
+            value={fundingIntervals}
+            onChange={(e) => setFundingIntervals(e.target.value)}
+            className="w-full rounded-lg border p-3"
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block font-medium">
+            Position Type
+          </span>
+          <select
+            value={positionType}
+            onChange={(e) =>
+              setPositionType(e.target.value as 'Long' | 'Short')
+            }
+            className="w-full rounded-lg border p-3"
+          >
+            <option value="Long">Long</option>
+            <option value="Short">Short</option>
+          </select>
+        </label>
+      </div>
+
+      <div className="space-y-3 rounded-xl border p-5">
+        <h3 className="text-xl font-semibold">
+          Estimated Funding Results
+        </h3>
+
+        {result ? (
+          <>
+            <p>
+              <strong>Funding per Interval:</strong>{' '}
+              {money(Math.abs(result.fundingPerInterval))}
+            </p>
+            <p>
+              <strong>Total Funding:</strong>{' '}
+              {money(Math.abs(result.totalFunding))}
+            </p>
+            <p>
+              <strong>Estimated Action:</strong>{' '}
+              {result.action}
+            </p>
+            <p>
+              <strong>Estimated Amount:</strong>{' '}
+              {money(Math.abs(result.signedPayment))}
+            </p>
+          </>
+        ) : (
+          <p className="text-sm text-red-600">
+            Please enter a positive position value, a valid funding rate,
+            and a whole number of funding intervals from 1 to 10,000.
+          </p>
+        )}
+      </div>
+
+      <p className="text-sm text-gray-600">
+        Educational estimate only. Assumes a constant position value
+        and funding rate across all intervals. Actual funding rates,
+        settlement schedules, exchange rules, and fees may vary.
+        This is not financial advice.
+      </p>
+    </div>
+  );
+}
+
 export default function Calculator({ slug }: { slug: ToolSlug }) {
   const config = configs[slug];
 
@@ -943,6 +1080,10 @@ if (slug === 'crypto-portfolio-allocation-calculator') {
 
 if (slug === 'crypto-portfolio-rebalancing-calculator') {
   return <PortfolioRebalancingCalculator />;
+}
+
+if (slug === 'crypto-futures-funding-fee-calculator') {
+  return <FuturesFundingFeeCalculator />;
 }
 
 if (slug === 'crypto-take-profit-calculator') {
