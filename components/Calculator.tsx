@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import {
-    cryptoValidatorRewards,
+    cryptoInflation,
+cryptoValidatorRewards,
    cryptoDcaExit,
       cryptoTakeProfit,
    cryptoLiquidationRisk,
@@ -1365,9 +1366,181 @@ function ValidatorRewardsCalculator() {
   );
 }
 
+function InflationCalculator() {
+  const [currentSupply, setCurrentSupply] = useState('1000000000');
+  const [annualInflationRate, setAnnualInflationRate] = useState('5');
+  const [years, setYears] = useState('10');
+  const [tokensOwned, setTokensOwned] = useState('100000');
+  const [currentTokenPrice, setCurrentTokenPrice] = useState('2');
+const result = cryptoInflation(
+    Number(currentSupply),
+    Number(annualInflationRate),
+    Number(years),
+    Number(tokensOwned),
+    Number(currentTokenPrice)
+  );
+
+  return (
+    <div className="calc-layout">
+      <h2>Crypto Inflation Calculator</h2>
+      <p>
+        Estimate future cryptocurrency supply, token inflation,
+        ownership dilution, and potential price changes assuming
+        a constant market capitalization.
+      </p>
+      
+      <div className="calc-funding-fields">
+        <label>
+          Current Circulating Supply (Tokens)
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={currentSupply}
+            onChange={(e) => setCurrentSupply(e.target.value)}
+          />
+        </label>
+         
+<label>
+  Annual Token Inflation Rate (%)
+  <input
+    type="number"
+    min="0"
+    max="1000"
+    step="any"
+    value={annualInflationRate}
+    onChange={(e) => setAnnualInflationRate(e.target.value)}
+  />
+</label>
+ 
+<label>
+  Number of Years
+  <input
+    type="number"
+    min="1"
+    max="100"
+    step="1"
+    value={years}
+    onChange={(e) => setYears(e.target.value)}
+  />
+</label>
+
+<label>
+  Tokens Owned
+  <input
+    type="number"
+    min="0"
+    step="any"
+    value={tokensOwned}
+    onChange={(e) => setTokensOwned(e.target.value)}
+  />
+</label>
+
+<label>
+  Current Token Price ($)
+  <input
+    type="number"
+    min="0"
+    step="any"
+    value={currentTokenPrice}
+    onChange={(e) => setCurrentTokenPrice(e.target.value)}
+  />
+</label>
+
+      </div>
+ 
+      {result ? (
+        <div className="panel">
+          <h3>Estimated Crypto Inflation Results</h3>
+
+          <p>
+            Future Circulating Supply:
+            {' '}{result.futureSupply.toLocaleString('en-US', {
+              maximumFractionDigits: 2
+            })} tokens
+          </p>
+
+          <p>
+            New Tokens Created:
+            {' '}{result.newTokensCreated.toLocaleString('en-US', {
+              maximumFractionDigits: 2
+            })} tokens
+          </p>
+
+          <p>
+            Total Supply Increase:
+            {' '}{result.totalSupplyIncrease.toFixed(2)}%
+          </p>
+
+          <p>
+            Current Ownership:
+            {' '}{result.currentOwnership.toFixed(6)}%
+          </p>
+
+          <p>
+            Future Ownership:
+            {' '}{result.futureOwnership.toFixed(6)}%
+          </p>
+
+          <p>
+            Ownership Dilution:
+            {' '}{result.ownershipDilution.toFixed(2)}%
+          </p>
+
+          <p>
+            Current Market Capitalization:
+            {' '}${result.currentMarketCap.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })}
+          </p>
+
+          <p>
+            Hypothetical Future Token Price:
+            {' '}${result.dilutedTokenPrice.toFixed(6)}
+          </p>
+
+          <p>
+            Current Holdings Value:
+            {' '}${result.currentHoldingsValue.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })}
+          </p>
+
+          <p>
+            Hypothetical Future Holdings Value:
+            {' '}${result.dilutedHoldingsValue.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })}
+          </p>
+
+          <p>
+            Estimates assume a constant annual inflation rate
+            and unchanged market capitalization. Actual token
+            prices may differ significantly.
+          </p>
+        </div>
+      ) : (
+        <p>
+          Please enter valid values. The inflation rate must
+          be between 0% and 1000%, years between 1 and 100,
+          and tokens owned cannot exceed circulating supply.
+        </p>
+      )}
+
+    </div>
+  );
+}
+
+
 
 export default function Calculator({ slug }: { slug: ToolSlug }) {
- 
+  if (slug === 'crypto-inflation-calculator') {
+    return <InflationCalculator />;
+  }
+
   if (slug === 'crypto-validator-rewards-calculator') {
     return <ValidatorRewardsCalculator />;
   }
