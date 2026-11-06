@@ -955,7 +955,9 @@ function FuturesFundingFeeCalculator() {
         </p>
       </div>
 
-      <div className="space-y-4 rounded-xl border p-5">
+      
+<div className="flex flex-col gap-5 rounded-xl border p-5 [&_label]:flex [&_label]:flex-col [&_label]:gap-2 [&_input]:w-full [&_input]:rounded-lg [&_input]:border [&_input]:p-3 [&_select]:w-full [&_select]:rounded-lg [&_select]:border [&_select]:p-3">
+
         <label className="block">
           <span className="mb-1 block font-medium">
             Position Value (USD)
