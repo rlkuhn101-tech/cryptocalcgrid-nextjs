@@ -86,7 +86,11 @@ export const tools = [
   name: 'Crypto Token Burn Calculator',
   description: 'Free Crypto Token Burn Calculator. Estimate remaining token supply and theoretical cryptocurrency price changes after a burn, assuming constant market capitalization.',
 },
-
+{
+  slug: 'crypto-take-profit-calculator',
+  name: 'Crypto Take-Profit Calculator',
+  description: 'Free Crypto Take-Profit Calculator. Plan cryptocurrency sales at multiple target prices, calculate potential profits, and estimate remaining token holdings.',
+},
 
   
 ] as const;
@@ -680,3 +684,101 @@ export function cryptoTokenBurn(
     percentageIncrease
   };
 }
+
+
+export function cryptoTakeProfit(
+  totalTokens: number,
+  averageBuyPrice: number,
+  targets: { price: number; percentage: number }[]
+) {
+  if (
+    !Number.isFinite(totalTokens) ||
+    !Number.isFinite(averageBuyPrice) ||
+    totalTokens <= 0 ||
+    averageBuyPrice < 0 ||
+    targets.length === 0 ||
+    targets.some(
+      t =>
+        !Number.isFinite(t.price) ||
+        !Number.isFinite(t.percentage) ||
+        t.price < 0 ||
+        t.percentage <= 0 ||
+        t.percentage > 100
+    )
+  ) {
+    return null;
+  }
+
+  const totalPercentage = targets.reduce(
+    (sum, t) => sum + t.percentage,
+    0
+  );
+
+  if (totalPercentage > 100.000001) return null;
+
+  const sales = targets.map(t => {
+    const tokensSold = totalTokens * (t.percentage / 100);
+    const proceeds = tokensSold * t.price;
+    const costBasis = tokensSold * averageBuyPrice;
+    const profit = proceeds - costBasis;
+
+    return {
+      targetPrice: t.price,
+      percentage: t.percentage,
+      tokensSold,
+      proceeds,
+      costBasis,
+      profit
+    };
+  });
+
+  const totalTokensSold = sales.reduce(
+    (sum, s) => sum + s.tokensSold,
+    0
+  );
+
+  const totalProceeds = sales.reduce(
+    (sum, s) => sum + s.proceeds,
+    0
+  );
+
+  const totalProfit = sales.reduce(
+    (sum, s) => sum + s.profit,
+    0
+  );
+
+  const remainingTokens = Math.max(
+    0,
+    totalTokens - totalTokensSold
+  );
+
+  if (
+    ![
+      totalPercentage,
+      totalTokensSold,
+      totalProceeds,
+      totalProfit,
+      remainingTokens
+    ].every(Number.isFinite) ||
+    sales.some(s =>
+      ![
+        s.tokensSold,
+        s.proceeds,
+        s.costBasis,
+        s.profit
+      ].every(Number.isFinite)
+    )
+  ) {
+    return null;
+  }
+
+  return {
+    sales,
+    totalPercentage,
+    totalTokensSold,
+    totalProceeds,
+    totalProfit,
+    remainingTokens
+  };
+}
+
