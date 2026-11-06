@@ -6,6 +6,7 @@ import {
    cryptoLiquidationRisk,
 cryptoApyVsApr,
  cryptoLoanToValue,
+  cryptoPortfolioRebalancing,
 averageBuyPrice,
   breakEvenPrice,
     cryptoPortfolioAllocation,
@@ -166,6 +167,10 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'loanBalance', label: 'Outstanding loan balance ($)', initial: 10000 },
     { name: 'maxLTV', label: 'Maximum allowed LTV (%)', initial: 50 }
   ]
+},
+
+'crypto-portfolio-rebalancing-calculator': {
+  fields: []
 },
 
 
@@ -385,6 +390,7 @@ function PortfolioAllocationCalculator() {
     setNextId(id => id + 1);
   }
 
+
   function removeHolding(id: number) {
     setHoldings(current =>
       current.length > 1
@@ -487,6 +493,214 @@ function PortfolioAllocationCalculator() {
   );
 }
 
+
+ // Crypto Portfolio Rebalancing Calculator
+
+function PortfolioRebalancingCalculator() {
+  const [holdings, setHoldings] = useState([
+    { id: 1, name: 'XRP', value: '25000', target: '40' },
+    { id: 2, name: 'Bitcoin', value: '15000', target: '40' },
+    { id: 3, name: 'HBAR', value: '10000', target: '20' }
+  ]);
+
+  const [nextId, setNextId] = useState(4);
+
+function updateHolding(
+  id: number,
+  field: 'name' | 'value' | 'target',
+  value: string
+) {
+  setHoldings(current =>
+    current.map(h =>
+      h.id === id ? { ...h, [field]: value } : h
+    )
+  );
+}
+
+function addHolding() {
+  setHoldings(current => [
+    ...current,
+    {
+      id: nextId,
+      name: '',
+      value: '',
+      target: ''
+    }
+  ]);
+
+  setNextId(id => id + 1);
+}
+
+function removeHolding(id: number) {
+  setHoldings(current =>
+    current.length > 1
+      ? current.filter(h => h.id !== id)
+      : current
+  );
+}
+
+
+const valid = holdings.every(
+  h =>
+    h.name.trim() !== '' &&
+    h.value.trim() !== '' &&
+    h.target.trim() !== '' &&
+    Number.isFinite(Number(h.value)) &&
+    Number.isFinite(Number(h.target)) &&
+    Number(h.value) >= 0 &&
+    Number(h.target) >= 0 &&
+    Number(h.target) <= 100
+);
+
+const result = valid
+  ? cryptoPortfolioRebalancing(
+      holdings.map(h => ({
+        name: h.name,
+        value: Number(h.value),
+        targetPercentage: Number(h.target)
+      }))
+    )
+  : null;
+
+return (
+  <div className="calc-layout">
+    <section className="panel">
+      <h2>Your cryptocurrency portfolio</h2>
+      <p>
+        Enter each cryptocurrency's current dollar value
+        and desired target allocation percentage.
+        All target percentages must total 100%.
+      </p>
+  
+<div className="fields">
+  {holdings.map((h, index) => (
+    <div key={h.id}>
+      <h3>Cryptocurrency {index + 1}</h3>
+
+      <label>
+        Cryptocurrency name
+        <input
+          type="text"
+          value={h.name}
+          placeholder="e.g. XRP"
+          onChange={e =>
+            updateHolding(h.id, 'name', e.target.value)
+          }
+        />
+      </label>
+
+      <label>
+        Current holding value ($)
+        <input
+          type="number"
+          min="0"
+          step="any"
+          value={h.value}
+          onChange={e =>
+            updateHolding(h.id, 'value', e.target.value)
+          }
+        />
+      </label>
+
+      <label>
+        Target allocation (%)
+        <input
+          type="number"
+          min="0"
+          max="100"
+          step="any"
+          value={h.target}
+          onChange={e =>
+            updateHolding(h.id, 'target', e.target.value)
+          }
+        />
+      </label>
+      
+<button
+  type="button"
+  onClick={() => removeHolding(h.id)}
+  disabled={holdings.length === 1}
+>
+  Remove Cryptocurrency
+</button>
+
+    </div>
+  ))}
+</div>
+
+<button type="button" onClick={addHolding}>
+  + Add Cryptocurrency
+</button>
+
+    </section>
+ 
+<section className="panel results" aria-live="polite">
+  <h2>Your rebalancing results</h2>
+
+  
+{result ? (
+  <>
+    <div className="result-row">
+      <span>Total portfolio value</span>
+      <strong>{money(result.totalValue)}</strong>
+    </div>
+  
+{result.allocations.map((h, index) => (
+  <div key={index}>
+    <h3>{h.name}</h3>
+
+    <div className="result-row">
+      <span>Current allocation</span>
+      <strong>
+        {h.currentPercentage.toFixed(2)}%
+      </strong>
+    </div>
+
+    <div className="result-row">
+      <span>Target allocation</span>
+      <strong>
+        {h.targetPercentage.toFixed(2)}%
+      </strong>
+    </div>
+
+    <div className="result-row">
+      <span>Target holding value</span>
+      <strong>{money(h.targetValue)}</strong>
+    </div>
+ 
+<div className="result-row">
+  <span>Recommended action</span>
+  <strong>
+    {h.action === 'No change'
+      ? 'No change needed'
+      : `${h.action} ${money(Math.abs(h.difference))}`}
+  </strong>
+</div>
+
+  </div>
+))}
+
+  </>
+) : (
+
+    <p role="alert">
+      Enter valid cryptocurrency values and target
+      percentages that add up to exactly 100%.
+    </p>
+  )}
+
+<p className="disclaimer">
+  Rebalancing estimates exclude trading fees,
+  taxes, and slippage. Results assume no deposits
+  or withdrawals. Not financial advice.
+</p>
+
+</section>
+
+  </div>
+);
+
+}
 
 function TakeProfitCalculator() {
   const [tokens, setTokens] = useState('10000');
@@ -725,6 +939,10 @@ export default function Calculator({ slug }: { slug: ToolSlug }) {
 
 if (slug === 'crypto-portfolio-allocation-calculator') {
   return <PortfolioAllocationCalculator />;
+}
+
+if (slug === 'crypto-portfolio-rebalancing-calculator') {
+  return <PortfolioRebalancingCalculator />;
 }
 
 if (slug === 'crypto-take-profit-calculator') {
