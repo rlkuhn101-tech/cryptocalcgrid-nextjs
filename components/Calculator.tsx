@@ -181,6 +181,7 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
 },
 'crypto-dca-exit-calculator': { fields: [] },
 'crypto-validator-rewards-calculator': { fields: [] },
+    'crypto-inflation-calculator': { fields: [] },
   'crypto-break-even-calculator': {
     fields: [
       { name: 'tokens', label: 'Tokens owned', initial: 10000 },
