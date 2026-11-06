@@ -4,7 +4,8 @@ import { useState } from 'react';
 import {
   cryptoTakeProfit,
    cryptoLiquidationRisk,
-averageBuyPrice,
+cryptoApyVsApr,
+ averageBuyPrice,
   breakEvenPrice,
     cryptoPortfolioAllocation,
    cryptoPositionSize,
@@ -145,6 +146,15 @@ const configs: Record<ToolSlug, { fields: Field[] }> = {
     { name: 'tokenPrice', label: 'Current token price ($)', initial: 2 },
     { name: 'loanBalance', label: 'Outstanding loan balance ($)', initial: 10000 },
     { name: 'liquidationLTV', label: 'Liquidation LTV threshold (%)', initial: 80 }
+  ]
+},
+
+'crypto-apy-vs-apr-calculator': {
+  fields: [
+    { name: 'principal', label: 'Initial investment ($)', initial: 10000 },
+    { name: 'apr', label: 'Annual percentage rate (APR %)', initial: 5 },
+    { name: 'compoundsPerYear', label: 'Compounding periods per year (12 monthly, 365 daily)', initial: 12 },
+    { name: 'years', label: 'Investment duration (years)', initial: 5 }
   ]
 },
 
@@ -1036,6 +1046,33 @@ if (slug === 'crypto-liquidation-risk-calculator') {
   } else {
     error =
       'Enter a collateral token quantity and token price greater than zero, a nonnegative loan balance, and a liquidation LTV threshold between 0% and 100%.';
+  }
+}
+
+if (slug === 'crypto-apy-vs-apr-calculator') {
+  const r = cryptoApyVsApr(
+    get('principal'),
+    get('apr'),
+    get('compoundsPerYear'),
+    get('years')
+  );
+
+  if (r) {
+    rows = [
+      ['Initial investment', money(r.principal)],
+      ['Annual percentage rate (APR)', `${r.apr.toFixed(2)}%`],
+      ['Effective annual yield (APY)', `${r.apy.toFixed(2)}%`],
+      ['Compounding periods per year', number(r.compoundsPerYear)],
+      ['Investment duration', `${number(r.years)} years`],
+      ['Earnings without compounding', money(r.simpleEarnings)],
+      ['Final value without compounding', money(r.simpleFinalValue)],
+      ['Earnings with compounding', money(r.compoundEarnings)],
+      ['Final value with compounding', money(r.compoundFinalValue)],
+      ['Extra earnings from compounding', money(r.extraEarnings)]
+    ];
+  } else {
+    error =
+      'Enter an investment greater than zero, an APR between 0% and 1000%, a whole-number compounding frequency from 1 to 365, and a duration from 0 to 50 years.';
   }
 }
 
