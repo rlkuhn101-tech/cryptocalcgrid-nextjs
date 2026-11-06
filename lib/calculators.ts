@@ -98,6 +98,12 @@ export const tools = [
   description: 'Free Crypto Liquidation Risk Calculator. Estimate cryptocurrency loan liquidation prices, loan-to-value ratios, collateral requirements, and how far crypto prices can fall before reaching a liquidation threshold.',
 },
 
+{
+  slug: 'crypto-apy-vs-apr-calculator',
+  name: 'Crypto APY vs APR Calculator',
+  description: 'Free Crypto APY vs APR Calculator. Compare cryptocurrency staking and lending returns, calculate compound interest, and see how compounding frequency affects annual percentage yield and earnings.',
+},
+
   
 ] as const;
 
@@ -854,6 +860,70 @@ export function cryptoLiquidationRisk(
     additionalCollateralValue,
     additionalTokens,
     atLiquidationRisk: currentLTV >= liquidationLTV
+  };
+}
+
+export function cryptoApyVsApr(
+  principal: number,
+  apr: number,
+  compoundsPerYear: number,
+  years: number
+) {
+  if (
+    ![principal, apr, compoundsPerYear, years].every(Number.isFinite) ||
+    principal <= 0 ||
+    apr < 0 ||
+    apr > 1000 ||
+    !Number.isInteger(compoundsPerYear) ||
+    compoundsPerYear < 1 ||
+    compoundsPerYear > 365 ||
+    years < 0 ||
+    years > 50
+  ) {
+    return null;
+  }
+
+  const annualRate = apr / 100;
+
+  const apy =
+    (Math.pow(1 + annualRate / compoundsPerYear, compoundsPerYear) - 1) * 100;
+
+  const simpleEarnings = principal * annualRate * years;
+  const simpleFinalValue = principal + simpleEarnings;
+
+  const compoundFinalValue =
+    principal * Math.pow(
+      1 + annualRate / compoundsPerYear,
+      compoundsPerYear * years
+    );
+
+  const compoundEarnings = compoundFinalValue - principal;
+  const extraEarnings = compoundEarnings - simpleEarnings;
+
+  if (
+    ![
+      apy,
+      simpleEarnings,
+      simpleFinalValue,
+      compoundFinalValue,
+      compoundEarnings,
+      extraEarnings
+    ].every(Number.isFinite)
+  ) {
+    return null;
+  }
+
+  return {
+    principal,
+    apr,
+    compoundsPerYear,
+    years,
+    apy,
+    simpleEarnings,
+    simpleFinalValue,
+    compoundFinalValue,
+    compoundEarnings,
+    extraEarnings
   };
 }
 
