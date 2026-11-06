@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Calculator from '../../../components/Calculator';
+import EmbedCodeButton from '../../../components/EmbedCodeButton';
 import { tools, type ToolSlug } from '../../../lib/calculators';
 import { calculatorContent } from '../../../lib/calculatorContent';
 import { calculatorFAQs } from '../../../lib/calculatorFAQs';
@@ -49,7 +50,7 @@ export default async function CalculatorPage({ params }: Props) {
       <p className="subhead">{tool.description}</p>
 
       <Calculator slug={slug as ToolSlug} />
-
+<EmbedCodeButton slug={slug} />
       {content && (
         <section className="info">
           <h2>How this calculator works</h2>
