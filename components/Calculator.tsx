@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import {
+   cryptoDcaExit,
   cryptoTakeProfit,
    cryptoLiquidationRisk,
 cryptoApyVsApr,
@@ -1059,7 +1060,173 @@ function FuturesFundingFeeCalculator() {
   );
 }
 
+function DcaExitCalculator() {
+  const [tokensOwned, setTokensOwned] = useState('20000');
+  const [averageBuyPrice, setAverageBuyPrice] = useState('1.50');
+  const [tokensPerSale, setTokensPerSale] = useState('2000');
+  const [numberOfSales, setNumberOfSales] = useState('10');
+  const [firstSalePrice, setFirstSalePrice] = useState('3.00');
+  const [priceChangePerSale, setPriceChangePerSale] = useState('0');
+
+  const result = cryptoDcaExit(
+    Number(tokensOwned),
+    Number(averageBuyPrice),
+    Number(tokensPerSale),
+    Number(numberOfSales),
+    Number(firstSalePrice),
+    Number(priceChangePerSale)
+  );
+
+  return (
+    <div className="calc-layout">
+      <h2>Crypto DCA Exit Calculator</h2>
+      <p>
+        Plan gradual cryptocurrency sales and estimate
+        proceeds, profits, and remaining token holdings.
+      </p>
+
+      <div className="calc-funding-fields">
+        <label>
+          Total Tokens Owned
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={tokensOwned}
+            onChange={(e) => setTokensOwned(e.target.value)}
+          />
+        </label>
+        
+        <label>
+          Average Purchase Price ($)
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={averageBuyPrice}
+            onChange={(e) => setAverageBuyPrice(e.target.value)}
+          />
+        </label>
+
+<label>
+  Tokens to Sell Per Period
+  <input
+    type="number"
+    min="0"
+    step="any"
+    value={tokensPerSale}
+    onChange={(e) => setTokensPerSale(e.target.value)}
+  />
+</label>
+
+<label>
+  Number of Scheduled Sales
+  <input
+    type="number"
+    min="1"
+    max="1000"
+    step="1"
+    value={numberOfSales}
+    onChange={(e) => setNumberOfSales(e.target.value)}
+  />
+</label>
+
+<label>
+  Starting Selling Price ($)
+  <input
+    type="number"
+    min="0"
+    step="any"
+    value={firstSalePrice}
+    onChange={(e) => setFirstSalePrice(e.target.value)}
+  />
+</label>
+
+<label>
+  Expected Price Change Per Sale (%)
+  <input
+    type="number"
+    step="any"
+    value={priceChangePerSale}
+    onChange={(e) => setPriceChangePerSale(e.target.value)}
+  />
+</label>
+
+     
+      </div>
+
+      {result ? (
+        <div className="panel">
+          <h3>Estimated DCA Exit Results</h3>
+          <p>Tokens Sold: {result.totalTokensSold.toLocaleString()}</p>
+          <p>Remaining Tokens: {result.remainingTokens.toLocaleString()}</p>
+          <p>
+            Total Sale Proceeds: ${result.totalProceeds.toLocaleString(
+              'en-US',
+              { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+            )}
+          </p>
+          <p>
+            Estimated Profit / Loss: ${result.totalProfit.toLocaleString(
+              'en-US',
+              { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+            )}
+          </p>
+          <p>
+            Average Selling Price: ${result.averageSalePrice.toFixed(4)}
+          </p>
+        </div>
+      ) : (
+        <p>Please enter valid values. Total scheduled sales cannot exceed your holdings.</p>
+      )}
+
+      
+      {result && (
+        <div className="panel">
+          <h3>Scheduled Sales Breakdown</h3>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', textAlign: 'right' }}>
+              <thead>
+                <tr>
+                  <th>Sale #</th>
+                  <th>Tokens</th>
+                  <th>Price</th>
+                  <th>Proceeds</th>
+                  <th>Profit / Loss</th>
+                </tr>
+              </thead>
+              <tbody>
+                {result.sales.map((sale) => (
+                  <tr key={sale.saleNumber}>
+                    <td>{sale.saleNumber}</td>
+                    <td>{sale.tokensSold.toLocaleString()}</td>
+                    <td>${sale.salePrice.toFixed(4)}</td>
+                    <td>${sale.proceeds.toFixed(2)}</td>
+                    <td>${sale.profit.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Estimates assume scheduled sales at hypothetical prices.
+            Trading fees and taxes are not included.
+          </p>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+
+
 export default function Calculator({ slug }: { slug: ToolSlug }) {
+ 
+  if (slug === 'crypto-dca-exit-calculator') {
+    return <DcaExitCalculator />;
+  }
+
   const config = configs[slug];
 
   const [values, setValues] = useState<Record<string, string>>(() =>
