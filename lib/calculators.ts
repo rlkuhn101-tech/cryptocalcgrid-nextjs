@@ -110,6 +110,12 @@ export const tools = [
   description: 'Free Crypto Loan-to-Value Calculator. Calculate your cryptocurrency-backed loan LTV ratio, maximum borrowing amount, available borrowing capacity, and collateral requirements.',
 },
 
+{
+  slug: 'crypto-portfolio-rebalancing-calculator',
+  name: 'Crypto Portfolio Rebalancing Calculator',
+  description: 'Free Crypto Portfolio Rebalancing Calculator. Calculate how much cryptocurrency to buy or sell to reach your target portfolio allocations and maintain your desired investment balance.',
+},
+
   
 ] as const;
 
@@ -984,6 +990,78 @@ export function cryptoLoanToValue(
     requiredCollateral,
     additionalCollateral,
     additionalTokens
+  };
+}
+
+export function cryptoPortfolioRebalancing(
+  holdings: {
+    name: string;
+    value: number;
+    targetPercentage: number;
+  }[]
+) {
+  if (
+    holdings.length === 0 ||
+    holdings.some(
+      h =>
+        !h.name.trim() ||
+        !Number.isFinite(h.value) ||
+        h.value < 0 ||
+        !Number.isFinite(h.targetPercentage) ||
+        h.targetPercentage < 0 ||
+        h.targetPercentage > 100
+    )
+  ) {
+    return null;
+  }
+
+  const totalValue = holdings.reduce(
+    (sum, h) => sum + h.value,
+    0
+  );
+
+  const totalTarget = holdings.reduce(
+    (sum, h) => sum + h.targetPercentage,
+    0
+  );
+
+  if (
+    !Number.isFinite(totalValue) ||
+    totalValue <= 0 ||
+    Math.abs(totalTarget - 100) > 0.000001
+  ) {
+    return null;
+  }
+
+  const allocations = holdings.map(h => {
+    const currentPercentage =
+      (h.value / totalValue) * 100;
+
+    const targetValue =
+      totalValue * (h.targetPercentage / 100);
+
+    const difference = targetValue - h.value;
+
+    return {
+      name: h.name,
+      currentValue: h.value,
+      currentPercentage,
+      targetPercentage: h.targetPercentage,
+      targetValue,
+      difference,
+      action:
+        Math.abs(difference) < 0.005
+          ? 'No change'
+          : difference > 0
+            ? 'Buy'
+            : 'Sell'
+    };
+  });
+
+  return {
+    totalValue,
+    totalTarget,
+    allocations
   };
 }
 
