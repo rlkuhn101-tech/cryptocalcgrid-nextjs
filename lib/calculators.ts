@@ -104,6 +104,12 @@ export const tools = [
   description: 'Free Crypto APY vs APR Calculator. Compare cryptocurrency staking and lending returns, calculate compound interest, and see how compounding frequency affects annual percentage yield and earnings.',
 },
 
+{
+  slug: 'crypto-loan-to-value-calculator',
+  name: 'Crypto Loan-to-Value Calculator',
+  description: 'Free Crypto Loan-to-Value Calculator. Calculate your cryptocurrency-backed loan LTV ratio, maximum borrowing amount, available borrowing capacity, and collateral requirements.',
+},
+
   
 ] as const;
 
@@ -924,6 +930,60 @@ export function cryptoApyVsApr(
     compoundFinalValue,
     compoundEarnings,
     extraEarnings
+  };
+}
+
+export function cryptoLoanToValue(
+  collateralTokens: number,
+  tokenPrice: number,
+  loanBalance: number,
+  maxLTV: number
+) {
+  if (
+    ![collateralTokens, tokenPrice, loanBalance, maxLTV].every(Number.isFinite) ||
+    collateralTokens <= 0 ||
+    tokenPrice <= 0 ||
+    loanBalance < 0 ||
+    maxLTV <= 0 ||
+    maxLTV > 100
+  ) {
+    return null;
+  }
+
+  const collateralValue = collateralTokens * tokenPrice;
+  const currentLTV = (loanBalance / collateralValue) * 100;
+  const maximumLoan = collateralValue * (maxLTV / 100);
+  const availableBorrowing = Math.max(0, maximumLoan - loanBalance);
+  const requiredCollateral = loanBalance / (maxLTV / 100);
+  const additionalCollateral = Math.max(0, requiredCollateral - collateralValue);
+  const additionalTokens = additionalCollateral / tokenPrice;
+
+  if (
+    ![
+      collateralValue,
+      currentLTV,
+      maximumLoan,
+      availableBorrowing,
+      requiredCollateral,
+      additionalCollateral,
+      additionalTokens
+    ].every(Number.isFinite)
+  ) {
+    return null;
+  }
+
+  return {
+    collateralTokens,
+    tokenPrice,
+    loanBalance,
+    maxLTV,
+    collateralValue,
+    currentLTV,
+    maximumLoan,
+    availableBorrowing,
+    requiredCollateral,
+    additionalCollateral,
+    additionalTokens
   };
 }
 
