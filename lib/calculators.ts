@@ -134,6 +134,12 @@ export const tools = [
   description: 'Free Crypto Validator Rewards Calculator. Estimate cryptocurrency validator rewards, annual operating costs, net earnings, and potential returns based on staked tokens and reward rates.',
 },
 
+{
+  slug: 'crypto-inflation-calculator',
+  name: 'Crypto Inflation Calculator',
+  description: 'Free Crypto Inflation Calculator. Estimate cryptocurrency token supply growth, annual inflation, future circulating supply, and the potential dilution of existing holdings.',
+},
+
   
 ] as const;
 
@@ -1298,6 +1304,103 @@ export function cryptoValidatorRewards(
     netAnnualRevenue,
     totalStake,
     netReturnOnOwnStake
+  };
+}
+
+
+export function cryptoInflation(
+  currentSupply: number,
+  annualInflationRate: number,
+  years: number,
+  tokensOwned: number,
+  currentTokenPrice: number
+) {
+  const inputs = [
+    currentSupply,
+    annualInflationRate,
+    years,
+    tokensOwned,
+    currentTokenPrice
+  ];
+
+  if (
+    !inputs.every(Number.isFinite) ||
+    currentSupply <= 0 ||
+    annualInflationRate < 0 ||
+    annualInflationRate > 1000 ||
+    !Number.isInteger(years) ||
+    years < 1 ||
+    years > 100 ||
+    tokensOwned < 0 ||
+    tokensOwned > currentSupply ||
+    currentTokenPrice < 0
+  ) {
+    return null;
+  }
+
+  const futureSupply =
+    currentSupply * Math.pow(1 + annualInflationRate / 100, years);
+
+  const newTokensCreated = futureSupply - currentSupply;
+
+  const totalSupplyIncrease =
+    (newTokensCreated / currentSupply) * 100;
+
+  const currentOwnership =
+    (tokensOwned / currentSupply) * 100;
+
+  const futureOwnership =
+    (tokensOwned / futureSupply) * 100;
+
+  const ownershipDilution =
+    currentOwnership > 0
+      ? (1 - futureOwnership / currentOwnership) * 100
+      : 0;
+
+  const currentMarketCap = currentSupply * currentTokenPrice;
+
+  const dilutedTokenPrice =
+    currentMarketCap / futureSupply;
+
+  const currentHoldingsValue =
+    tokensOwned * currentTokenPrice;
+
+  const dilutedHoldingsValue =
+    tokensOwned * dilutedTokenPrice;
+
+  const results = [
+    futureSupply,
+    newTokensCreated,
+    totalSupplyIncrease,
+    currentOwnership,
+    futureOwnership,
+    ownershipDilution,
+    currentMarketCap,
+    dilutedTokenPrice,
+    currentHoldingsValue,
+    dilutedHoldingsValue
+  ];
+
+  if (!results.every(Number.isFinite)) {
+    return null;
+  }
+
+  return {
+    currentSupply,
+    annualInflationRate,
+    years,
+    tokensOwned,
+    currentTokenPrice,
+    futureSupply,
+    newTokensCreated,
+    totalSupplyIncrease,
+    currentOwnership,
+    futureOwnership,
+    ownershipDilution,
+    currentMarketCap,
+    dilutedTokenPrice,
+    currentHoldingsValue,
+    dilutedHoldingsValue
   };
 }
 
