@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import {
+    cryptoValidatorRewards,
    cryptoDcaExit,
-  cryptoTakeProfit,
+      cryptoTakeProfit,
    cryptoLiquidationRisk,
 cryptoApyVsApr,
  cryptoLoanToValue,
@@ -1220,9 +1221,156 @@ function DcaExitCalculator() {
 }
 
 
+function ValidatorRewardsCalculator() {
+  const [ownStake, setOwnStake] = useState('10000');
+  const [delegatedStake, setDelegatedStake] = useState('100000');
+  const [annualRewardRate, setAnnualRewardRate] = useState('5');
+  const [commissionRate, setCommissionRate] = useState('10');
+  const [tokenPrice, setTokenPrice] = useState('2');
+  const [annualOperatingCosts, setAnnualOperatingCosts] = useState('1200');
+   const result = cryptoValidatorRewards(
+    Number(ownStake),
+    Number(delegatedStake),
+    Number(annualRewardRate),
+    Number(commissionRate),
+    Number(tokenPrice),
+    Number(annualOperatingCosts)
+  );
+
+  return (
+    <div className="calc-layout">
+      <h2>Crypto Validator Rewards Calculator</h2>
+      <p>
+        Estimate annual validator rewards, delegation commissions,
+        operating expenses, and potential net earnings.
+      </p>
+       
+      <div className="calc-funding-fields">
+        <label>
+          Your Own Staked Tokens
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={ownStake}
+            onChange={(e) => setOwnStake(e.target.value)}
+          />
+        </label>
+        
+<label>
+  Delegated Staked Tokens
+  <input
+    type="number"
+    min="0"
+    step="any"
+    value={delegatedStake}
+    onChange={(e) => setDelegatedStake(e.target.value)}
+  />
+</label>
+
+<label>
+  Annual Reward Rate (%)
+  <input
+    type="number"
+    min="0"
+    step="any"
+    value={annualRewardRate}
+    onChange={(e) => setAnnualRewardRate(e.target.value)}
+  />
+</label>
+
+<label>
+  Validator Commission Rate (%)
+  <input
+    type="number"
+    min="0"
+    max="100"
+    step="any"
+    value={commissionRate}
+    onChange={(e) => setCommissionRate(e.target.value)}
+  />
+</label>
+
+<label>
+  Cryptocurrency Token Price ($)
+  <input
+    type="number"
+    min="0"
+    step="any"
+    value={tokenPrice}
+    onChange={(e) => setTokenPrice(e.target.value)}
+  />
+</label>
+
+<label>
+  Annual Operating Costs ($)
+  <input
+    type="number"
+    min="0"
+    step="any"
+    value={annualOperatingCosts}
+    onChange={(e) => setAnnualOperatingCosts(e.target.value)}
+  />
+</label>
+
+      </div>
+
+      {result ? (
+        <div className="panel">
+          <h3>Estimated Annual Validator Rewards</h3>
+
+          <p>
+            Total Staked Tokens: {result.totalStake.toLocaleString()}
+          </p>
+          <p>
+            Rewards From Your Own Stake:
+            {' '}{result.ownStakeRewards.toLocaleString()} tokens
+          </p>
+          <p>
+            Commission From Delegated Stake:
+            {' '}{result.commissionRewards.toLocaleString()} tokens
+          </p>
+          <p>
+            Total Validator Rewards:
+            {' '}{result.totalValidatorRewards.toLocaleString()} tokens
+          </p>
+          <p>
+            Gross Annual Revenue:
+            {' '}${result.grossAnnualRevenue.toFixed(2)}
+          </p>
+          <p>
+            Annual Operating Costs:
+            {' '}${result.annualOperatingCosts.toFixed(2)}
+          </p>
+          <p>
+            Net Annual Revenue:
+            {' '}${result.netAnnualRevenue.toFixed(2)}
+          </p>
+          <p>
+            Net Return on Own Stake:
+            {' '}{result.netReturnOnOwnStake === null
+              ? 'N/A'
+              : result.netReturnOnOwnStake.toFixed(2) + '%'}
+          </p>
+        </div>
+      ) : (
+        <p>
+          Please enter valid values. Rates and costs cannot
+          be negative, and commission must be between 0% and 100%.
+        </p>
+      )}
+
+    </div>
+  );
+}
+
 
 export default function Calculator({ slug }: { slug: ToolSlug }) {
  
+  if (slug === 'crypto-validator-rewards-calculator') {
+    return <ValidatorRewardsCalculator />;
+  }
+
   if (slug === 'crypto-dca-exit-calculator') {
     return <DcaExitCalculator />;
   }
