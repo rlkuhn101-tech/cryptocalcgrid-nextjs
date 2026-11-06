@@ -13,7 +13,7 @@ export default function EmbedCodeButton({ slug }: Props) {
   const embedCode = `<iframe
   src="https://www.cryptocalcgrid.com/embed/${slug}"
   width="100%"
-  height="850"
+  height="1100"
   style="border:0;border-radius:12px;"
   loading="lazy"
   title="CryptoCalcGrid Calculator"
